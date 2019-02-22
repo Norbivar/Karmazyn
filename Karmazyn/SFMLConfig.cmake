@@ -21,6 +21,9 @@
 	endif()
 	if (EXISTS "$ENV{SFML_ROOT}/lib")
 		set(SFML_LIBRARIES "$ENV{SFML_ROOT}/lib/")
+		file(GLOB SFML_ALL_LIBS
+			"${SFML_LIBRARIES}/*.lib"
+		)
 	else()
 		 message(FATAL_ERROR "Could not find SFML lib dir!")
 	endif()

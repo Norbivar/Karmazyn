@@ -22,4 +22,4 @@ file(GLOB Karmazyn_SRC
 add_executable(Karmazyn ${Karmazyn_SRC} "../Libs/Logger.cpp" "../Libs/Logger.h")
 
 include_directories(BEFORE ${Boost_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} "../Libs/") 
-target_link_libraries(Karmazyn ${Boost_LIBRARIES} ${SFML_LIBRARIES})
+target_link_libraries(Karmazyn ${Boost_LIBRARIES} ${SFML_ALL_LIBS})
