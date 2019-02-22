@@ -19,6 +19,13 @@ namespace Karmazyn
 			spdlog::set_async_mode(8192);
 			spdlog::set_pattern("[%H:%M:%S] %v");
 			spdlog::drop_all();
+			RotatedTxtLogger->info("\n============================================================================================================");
+			RotatedTxtLogger->info("Log started.");
+		}
+		~Logger()
+		{
+			RotatedTxtLogger->info("Log stopped.");
+			RotatedTxtLogger->info("============================================================================================================");
 		}
 
 		template<typename Arg1, typename... Args>
