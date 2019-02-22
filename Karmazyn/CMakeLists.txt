@@ -14,7 +14,7 @@ set(SFML_DIR ".")
 set(SFML_STATIC_LIBRARIES FALSE)
 find_package(SFML REQUIRED)
 
-file(GLOB Karmazyn_SRC
+file(GLOB_RECURSE Karmazyn_SRC
     "*.h"
 	"*.hpp"
     "*.cpp"
