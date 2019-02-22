@@ -1,16 +1,8 @@
-﻿// Karmazyn.cpp : Defines the entry point for the application.
-//
-
-#include "Karmazyn.h"
-
-using namespace std;
+﻿#include "Karmazyn.h"
+#include "Application.hpp"
 
 int main()
 {
-	cout << "Hello CMake." << endl;
-	while (true)
-	{
-
-	}
-	return 0;
+	Karmazyn::Application app;
+	return app.Run();
 }
