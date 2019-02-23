@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <Config.hpp>
 
 #include <stack>
 #include <memory>
@@ -21,6 +22,7 @@ namespace Karmazyn
 		const Application& operator=(const Application&) = delete;
 		const Application& operator=(Application&&) = delete;
 
+		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
 		std::stack<std::unique_ptr<IGameState>> m_GameStateStack;
 	};

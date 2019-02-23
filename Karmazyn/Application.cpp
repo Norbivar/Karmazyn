@@ -1,5 +1,7 @@
 
-#include <Logger.h>
+#include <Logger.hpp>
+#include <ConfigList.hpp>
+
 #include "GameState/IGameState.hpp"
 #include "GameState/GameStateMenu.hpp"
 
@@ -7,10 +9,17 @@
 
 namespace Karmazyn
 {
-	Application::Application()
+	Application::Application() :
+		m_Config(ConfigSettings::cConfigFilesToReadInOrder)
 	{
-		m_RenderWindow.create(sf::VideoMode(1024, 768), "Karmazyn"); // TODO: refactor to use a config-usable render size
-		m_RenderWindow.setFramerateLimit(60); // TODO: refactor to use config-usable frame limit
+		m_RenderWindow.create(sf::VideoMode(
+			m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Render_X, 1024), 
+			m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Render_Y, 768)
+		), "Karmazyn"); 
+
+		m_RenderWindow.setFramerateLimit(
+			m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Frame_Cap, 60)
+		);
 
 		m_GameStateStack.emplace(new GameState_Menu(this));
 	}
@@ -24,9 +33,9 @@ namespace Karmazyn
 			const auto diff = clock.restart().asMilliseconds();
 			const auto& top = m_GameStateStack.top();
 
-			top->update(diff);
-			top->handleInput();
-			top->render();
+			//top->update(diff);
+			//top->handleInput();
+			//top->render();
 		}
 		return 0;
 	}

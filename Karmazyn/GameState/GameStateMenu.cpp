@@ -1,5 +1,5 @@
 #include "GameStateMenu.hpp"
-#include <Logger.h>
+#include <Logger.hpp>
 
 namespace Karmazyn
 {

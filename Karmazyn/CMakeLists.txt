@@ -19,7 +19,7 @@ file(GLOB_RECURSE Karmazyn_SRC
 	"*.hpp"
     "*.cpp"
 )
-add_executable(Karmazyn ${Karmazyn_SRC} "../Libs/Logger.cpp" "../Libs/Logger.h")
+add_executable(Karmazyn ${Karmazyn_SRC} "../Libs/Logger.cpp" "../Libs/Logger.hpp" "../Libs/Config.hpp" "../Libs/Config.cpp")
 
 include_directories(BEFORE ${Boost_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} "../Libs/") 
 target_link_libraries(Karmazyn ${Boost_LIBRARIES} ${SFML_ALL_LIBS})

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Logger.h"
+#include "Logger.hpp"
 namespace Karmazyn
 {
 	Logger* Logger::GetLogger()
