@@ -1,22 +1,30 @@
 #pragma once
 
 #include <cstdint>
+#include <SFML/Window/Event.hpp>
 
 namespace Karmazyn
 {
-	class Application;
+	class GameEngine;
 
 	class IGameState
 	{
 	public:
-		IGameState(Application* app) : m_Application(app) { }
+		IGameState(GameEngine& engine) : m_Engine(engine) { }
 		virtual ~IGameState() { }
 
-		virtual void update(uint32_t diff) = 0;
-		virtual void render() = 0;
-		virtual void handleInput() = 0;
+		// Each of the below methods return value is a signal to the core: 
+		//	if a function returns true, it will swallow that triggering of event: it will not be sent to subsequent layers
+
+		virtual bool update(float diff) = 0;
+		virtual bool render() = 0;
+
+		virtual bool handleEvent(const sf::Event& event) 
+		{
+			return false; 
+		}
 
 	protected:
-		Application* m_Application;
+		GameEngine& m_Engine;
 	};
 }
