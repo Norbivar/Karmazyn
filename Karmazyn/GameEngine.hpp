@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <Config.hpp>
 
+#include <atomic>
 #include <stack>
 #include <memory>
 #include <thread>
@@ -19,6 +20,9 @@ namespace Karmazyn
 
 		int Run();
 
+		// Stops the render thread (and joins+destroys), and closes the render window.
+		void Stop();
+
 		sf::RenderWindow& getRenderWindow() { return m_RenderWindow; }
 	private:
 		GameEngine(const GameEngine&) = delete;
@@ -34,6 +38,7 @@ namespace Karmazyn
 		// 2. calls m_GameStates.top().render();
 		// 3. draws renderwindow
 		std::unique_ptr<std::thread> m_RenderThread;
+		std::atomic<bool> m_RunRenderThread;
 
 		// The currently present game states. 
 		// The top of the stack will receive the calls from the main game loop, only.
