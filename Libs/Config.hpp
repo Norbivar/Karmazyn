@@ -2,7 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
-#include <unordered_map>
+#include <map>
 #include <exception>
 
 #include "LibSettings.hpp"
@@ -40,52 +40,35 @@ namespace Karmazyn
 		// Returns the first match of "configname" or the default value if not found any.
 		// Wrong types will cause a boost::bad_cast exception (boost::any-based).
 		template<typename T>
-		T get(const char* root, const char* configname, T defaultval)
+		T get(const char* configname, T defaultval)
 		{
-			auto& foundroot = m_SettingsRootMap.find(root);
-			if(foundroot != m_SettingsRootMap.end())
+			const auto& node = m_SettingsRootMap.find(configname);
+			if (node != m_SettingsRootMap.end())
 			{
-				auto& node = foundroot->second.find(configname);
-				if (node != foundroot->second.end())
-				{
-					return boost::lexical_cast<T>(node->second);
-				}
+				return boost::lexical_cast<T>(node->second);
 			}
 			if (ConfigSettings::cLogUnsuccessfulConfigGets)
-				theLog->warn("Config: Lookup for [{}]: {} was UNSUCCESSFUL!", root, configname);
+				theLog->warn("Config: Lookup for: '{}' was UNSUCCESSFUL, returning default!", configname);
 
+			set<T>(configname, defaultval); // this will make sure that not found configs at first run will get printed out to .ini. TODO: think this through
 			return defaultval;
 		}
 
 		template<typename T>
-		T get(const char* root, const char* configname)
+		T get(const char* configname)
 		{
-			auto& foundroot = m_SettingsRootMap.find(root);
-			if (foundroot != m_SettingsRootMap.end())
+			const auto& node = m_SettingsRootMap.find(configname);
+			if (node != m_SettingsRootMap.end())
 			{
-				auto& node = foundroot->second.find(configname);
-				if (node != foundroot->second.end())
-				{
-					return boost::lexical_cast<T>(node->second);
-				}
+				return boost::lexical_cast<T>(node->second);
 			}
 			throw ConfigNotFoundException(std::string("CONFIG: Could not find: [") + std::string(root) + std::string("] ") + std::string(configname));
 		}
 
 		template<typename T>
-		bool set(const char* root, const char* configname, const T& setto)
+		void set(const char* configname, const T& setto)
 		{
-			auto& foundroot = m_SettingsRootMap.find(root);
-			if (foundroot != m_SettingsRootMap.end())
-			{
-				auto& node = foundroot->second.find(configname);
-				if (node != foundroot->second.end())
-				{
-					node->second = boost::lexical_cast<std::string>(setto);
-					return true;
-				}
-			}
-			return false; // TODO: consider throwing?
+			m_SettingsRootMap[configname] = boost::lexical_cast<std::string>(setto);
 		}
 
 		void saveAllConfigTo(const char* filename);
@@ -94,12 +77,6 @@ namespace Karmazyn
 	private:
 		bool readFile(const char* filename);
 
-		std::unordered_map<
-			std::string, 
-			std::unordered_map<
-				std::string, 
-				std::string
-			>
-		> m_SettingsRootMap;
+		std::map<std::string, std::string> m_SettingsRootMap;
 	};
 }

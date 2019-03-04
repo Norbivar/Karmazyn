@@ -17,11 +17,7 @@ namespace Karmazyn
 		{
 			for (const auto& roots : m_SettingsRootMap)
 			{
-				output << "[" << roots.first.c_str() << "]\n";
-				for (const auto& settings : roots.second)
-					output << settings.first.c_str() << "=" << settings.second.c_str() << "\n";
-
-				output << "\n";
+				output << roots.first.c_str() << "=" << roots.second.c_str() << "\n";
 			}
 		}
 	}
@@ -40,35 +36,25 @@ namespace Karmazyn
 		if (input.good())
 		{
 			std::string line;
-			std::string last_root;
 			while (std::getline(input, line))
 			{
 				if (std::regex_match(line, ConfigSettings::cConfigValidLineRegex))
 				{
-					if (last_root.empty())
+					const auto eqpos = line.find_first_of('=');
+					const std::string key = line.substr(0, eqpos);
+					const std::string valueText = line.substr(eqpos + 1);
+
+					if (m_SettingsRootMap.find(key) != m_SettingsRootMap.end())
 					{
-						theLog->error("Config: line found with no appropriate root in file {}! Interrupting read!", filename);
-						break;
+						theLog->warn("Config: Duplicate key in config ({}), skipping!", key.c_str());
+						continue;
 					}
 
-					auto rootmap = m_SettingsRootMap.find(last_root);
-					if (rootmap != m_SettingsRootMap.end())
-					{
-						const auto eqpos = line.find_first_of('=');
-						const std::string key = line.substr(0, eqpos);
-						const std::string valueText = line.substr(eqpos + 1);
-
-						rootmap->second.emplace(key, valueText);
-					}
+					m_SettingsRootMap.emplace(key, valueText);
 				}
-				else if (std::regex_match(line, ConfigSettings::cConfigRootRegex)) // we should have much fewer roots than actual settings
+				else
 				{
-					const std::string rootname = line.substr(line.find_first_of('[') + 1, line.length() - 2);
-					m_SettingsRootMap.emplace(
-						rootname, // TODO: consider refactor, maybe with regex
-						std::unordered_map<std::string, std::string>()
-					);
-					last_root = rootname;
+					theLog->warn("Config: invalid line detected, skipping!");
 				}
 			}
 			return true;
