@@ -15,6 +15,27 @@ namespace Karmazyn
 
 	class GameEngine
 	{
+		// Helper class, providing a safer top() behaviour, that is guaranteed to return a valid reference.
+		class GameStateStack
+		{
+		public:
+			void emplace(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.emplace(std::move(what)); }
+			void pop() { m_UnderlyingStack.pop(); }
+			//void push(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.push(what); }
+
+			std::unique_ptr<IGameState>& top()
+			{
+				if (m_UnderlyingStack.size() == 0)
+					return m_Default;
+
+				return m_UnderlyingStack.top();
+			}
+
+		private:
+			std::unique_ptr<IGameState> m_Default;
+			std::stack<std::unique_ptr<IGameState>> m_UnderlyingStack;
+		};
+
 	public:
 		GameEngine();
 
@@ -41,7 +62,7 @@ namespace Karmazyn
 		std::atomic<bool> m_RunRenderThread;
 
 		// The currently present game states. 
-		// The top of the stack will receive the calls from the main game loop, only.
-		std::stack<std::unique_ptr<IGameState>> m_GameStates;
+		// The top of the stack will receive the calls from the main game loop (event, update, render), only.
+		GameStateStack m_GameStates;
 	};
 }

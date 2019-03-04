@@ -11,10 +11,11 @@ namespace Karmazyn
 		GameState_LoadingMenu(GameEngine& engine);
 		~GameState_LoadingMenu() override;
 
-		bool update(float diff) override;
-		bool render() override;
-		bool handleEvent(const sf::Event& event) override;
+		void update(uint64_t diff) override;
+		void render() override;
+		void handleEvent(const sf::Event& event) override;
 	private:
 		sf::CircleShape shape;
+		std::vector<sf::CircleShape> shapesToFuckAroundWith;
 	};
 }

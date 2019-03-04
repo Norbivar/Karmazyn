@@ -15,8 +15,8 @@ namespace Karmazyn
 
 		m_RenderWindow.create(
 			sf::VideoMode(
-				m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Render_X, 1024), 
-				m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Render_Y, 768)
+				m_Config.get<int>(Configs::ResolutionX, 1024),
+				m_Config.get<int>(Configs::ResolutionY, 768)
 			),
 			"Karmazyn", 
 			sf::Style::None,
@@ -24,7 +24,7 @@ namespace Karmazyn
 		); // TODO: set style to sf::Style::Fullscreen | sf::Style::None when fitting
 
 		m_RenderWindow.setFramerateLimit(
-			m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Frame_Cap, 60)
+			m_Config.get<int>(Configs::FrameRateCap, 60)
 		);
 
 		m_GameStates.emplace(
@@ -50,12 +50,13 @@ namespace Karmazyn
 		bool propagnateEvent = false;
 		sf::Event polledEvent;
 
-		const float MS_PER_UPDATE = 1000.0f / m_Config.get<int>(Configs::Root_Graphics, Configs::Graphics_Frame_Cap, 60);
-		float diff = 0.0f;
+		const int64_t MICROSECONDS_PER_UPDATE = 1000000 / m_Config.get<int>(Configs::FrameRateCap, 60);
+		sf::Int64 diff = 0;
 
+		// Main threads main game loop. Application will exit after this.
 		while (m_RenderWindow.isOpen())
 		{
-			diff += clock.restart().asSeconds();
+			diff += clock.restart().asMicroseconds();
 
 			propagnateEvent = m_RenderWindow.pollEvent(polledEvent);
 			if (polledEvent.type == sf::Event::Closed)
@@ -65,10 +66,10 @@ namespace Karmazyn
 			if (propagnateEvent)
 				top->handleEvent(polledEvent);
 			
-			while (diff >= MS_PER_UPDATE) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
+			while (diff >= MICROSECONDS_PER_UPDATE) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
 			{
 				top->update(diff);
-				diff -= MS_PER_UPDATE;
+				diff -= MICROSECONDS_PER_UPDATE;
 			}
 		}
 		return 0;

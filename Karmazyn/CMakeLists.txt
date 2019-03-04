@@ -30,12 +30,12 @@ find_package(SFML REQUIRED)
 
 file(GLOB_RECURSE Karmazyn_SRC
     "*.h"
-	"*.hpp"
+    "*.hpp"
     "*.cpp"
 )
 file(GLOB_RECURSE Libs_SRC
     "../Libs/*.h"
-	"../Libs/*.hpp"
+    "../Libs/*.hpp"
     "../Libs/*.cpp"
 )
 message("Building with GUI_TYPE: ${GUI_TYPE}")

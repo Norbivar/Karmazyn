@@ -16,7 +16,7 @@ namespace Karmazyn
 
 	}
 
-	bool GameState_LoadingMenu::handleEvent(const sf::Event& event)
+	void GameState_LoadingMenu::handleEvent(const sf::Event& event)
 	{
 		switch (event.type)
 		{
@@ -30,21 +30,30 @@ namespace Karmazyn
 			{
 				if (event.mouseButton.button == sf::Mouse::Button::Left)
 				{
-					m_Engine.getRenderWindow().close();
+					sf::CircleShape tmp(5.0f);
+					tmp.setPosition(
+						static_cast<float>(event.mouseButton.x), 
+						static_cast<float>(event.mouseButton.y)
+					);
+					shapesToFuckAroundWith.emplace_back(std::move(tmp));
+				}
+				else if (event.mouseButton.button == sf::Mouse::Button::Right)
+				{
+					m_Engine.Stop();
 				}
 				break;
 			}
 		}
-		return true;
 	}
-	bool GameState_LoadingMenu::render() // called by a different thread, but .draw() takes const ref, so it should be fine
+	void GameState_LoadingMenu::render() // called by a different thread, but .draw() takes const ref, so it should be fine
 	{
+		for (const auto& it : shapesToFuckAroundWith)
+			m_Engine.getRenderWindow().draw(it);
+
 		m_Engine.getRenderWindow().draw(shape);
-		return true;
 	}
-	bool GameState_LoadingMenu::update(float diff)
+	void GameState_LoadingMenu::update(uint64_t diff)
 	{
 
-		return true;
 	}
 }
