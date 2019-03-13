@@ -53,6 +53,8 @@ namespace Karmazyn
 		const GameEngine& operator=(const GameEngine&) = delete;
 		const GameEngine& operator=(GameEngine&&) = delete;
 
+		bool m_IsRunning;
+
 		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
 		AssetManager m_Assets;

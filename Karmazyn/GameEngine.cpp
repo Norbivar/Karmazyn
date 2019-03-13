@@ -9,7 +9,8 @@
 namespace Karmazyn
 {
 	GameEngine::GameEngine() :
-		m_Config(ConfigSettings::cConfigFilesToReadInOrder)
+		m_IsRunning{ false },
+		m_Config{ ConfigSettings::cConfigFilesToReadInOrder}
 	{
 		sf::ContextSettings contextSettings;
 		int windowStyle = m_Config.get<int>(Configs::RenderWindowStyle, sf::Style::None | sf::Style::Fullscreen);
@@ -36,6 +37,13 @@ namespace Karmazyn
 	}
 	int GameEngine::Run()
 	{
+		if (m_IsRunning)
+		{
+			theLog->warn("GameEngine Run() was called while it was already running!");
+			return 1;
+		}
+		m_IsRunning = true;
+			
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
 
@@ -59,6 +67,12 @@ namespace Karmazyn
 		// Main threads main game loop. Application will exit after this.
 		while (m_RenderWindow.isOpen())
 		{
+			if (!m_RenderWindow.hasFocus())
+			{
+				sf::sleep(sf::milliseconds(100));
+				continue;
+			}
+
 			diff += clock.restart().asMicroseconds();
 
 			propagnateEvent = m_RenderWindow.pollEvent(polledEvent);
@@ -75,14 +89,20 @@ namespace Karmazyn
 				diff -= MICROSECONDS_PER_UPDATE;
 			}
 		}
+		theLog->info("GameEngine stopping!");
 		return 0;
 	}
 	void GameEngine::Stop()
 	{
-		m_RunRenderThread.store(false, std::memory_order::memory_order_relaxed);
-		m_RenderThread->join();
-		m_RenderThread.reset();
+		if (m_IsRunning)
+		{
+			m_RunRenderThread.store(false, std::memory_order::memory_order_relaxed);
+			m_RenderThread->join();
+			m_RenderThread.reset();
+			m_IsRunning = false;
 
-		m_RenderWindow.close();
+			m_RenderWindow.close();
+		}
+		else theLog->warn("GameEngine Stop() was called while not running!");
 	}
 }
