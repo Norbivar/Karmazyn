@@ -1,44 +1,21 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <Logger.hpp>
 #include <Config.hpp>
 
 #include <atomic>
-#include <stack>
 #include <memory>
 #include <thread>
 
-#include "GameState/IGameState.hpp"
-#include "AssetManager/AssetManager.hpp"
-
 namespace Karmazyn
 {
-	class IGameState;
+	class AssetManager; class GameStateStack;
 
 	class GameEngine
 	{
-		// Helper class, providing a safer top() behaviour, that is guaranteed to return a valid reference.
-		class GameStateStack
-		{
-		public:
-			void emplace(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.emplace(std::forward<std::unique_ptr<IGameState>>(what)); }
-			void pop() { m_UnderlyingStack.pop(); }
-			//void push(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.push(what); }
-
-			std::unique_ptr<IGameState>& top()
-			{
-				if (m_UnderlyingStack.size() == 0)
-					return m_Default;
-
-				return m_UnderlyingStack.top();
-			}
-
-		private:
-			std::unique_ptr<IGameState> m_Default;
-			std::stack<std::unique_ptr<IGameState>> m_UnderlyingStack;
-		};
-
 	public:
 		GameEngine();
+		~GameEngine(); // otherwise the default destructor will cry not knowing how to delete pointers of uncomplete types
 
 		int Run();
 
@@ -46,7 +23,7 @@ namespace Karmazyn
 		void Stop();
 
 		sf::RenderWindow& getRenderWindow() { return m_RenderWindow; }
-		AssetManager& getAssetManager()     { return m_Assets; }
+		AssetManager& getAssetManager()     { return *m_Assets; }
 	private:
 		GameEngine(const GameEngine&) = delete;
 		GameEngine(GameEngine&&) = delete;
@@ -57,7 +34,7 @@ namespace Karmazyn
 
 		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
-		AssetManager m_Assets;
+		std::unique_ptr<AssetManager> m_Assets;
 
 		// This thread:
 		// 1. clears renderwindow
@@ -68,6 +45,6 @@ namespace Karmazyn
 
 		// The currently present game states. 
 		// The top of the stack will receive the calls from the main game loop (event, update, render), only.
-		GameStateStack m_GameStates;
+		std::unique_ptr<GameStateStack> m_GameStates;
 	};
 }

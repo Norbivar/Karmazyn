@@ -2,11 +2,16 @@
 
 #include "IGameState.hpp"
 
-class GameState_Blank : public IGameState
+namespace Karmazyn
 {
-	~GameState_Blank() override { }
+	class GameState_Blank : public IGameState
+	{
+	public:
+		GameState_Blank(GameEngine& engine) : IGameState(engine) {}
+		~GameState_Blank() override { }
 
-	void update(uint64_t diff) override { }
-	void render() override { }
-	void handleEvent(const sf::Event& event) override { }
-};
+		void update(uint64_t diff) override { }
+		void render() override { }
+		void handleEvent(const sf::Event& event) override { }
+	};
+}
