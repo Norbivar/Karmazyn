@@ -1,5 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "../GameEngine.hpp"
 #include "IGameState.hpp"
 
@@ -11,11 +10,12 @@ namespace Karmazyn
 		GameState_LoadingMenu(GameEngine& engine);
 		~GameState_LoadingMenu() override;
 
+		#pragma region IGameState_Implementation
 		void update(uint64_t diff) override;
 		void render() override;
 		void handleEvent(const sf::Event& event) override;
+		#pragma endregion
+		
 	private:
-		sf::CircleShape shape;
-		std::vector<sf::CircleShape> shapesToFuckAroundWith;
 	};
 }

@@ -6,18 +6,19 @@
 namespace Karmazyn
 {
 	class GameEngine;
-
 	class IGameState
 	{
 	public:
-		IGameState(GameEngine& engine) : m_Engine(engine) { }
+		IGameState(GameEngine& engine);
 		virtual ~IGameState() { }
 
-		// Each of the below methods return value is a signal to the core: 
-		//	if a function returns true, it will swallow that triggering of event: it will not be sent to subsequent layers
-
+		// Called periodically.
 		virtual void update(uint64_t diff) = 0;
+
+		// You should queue up (draw(...)) all your drawables in this function. Clearing and displaying is handled by the render thread.
 		virtual void render() = 0;
+
+		// Called whenever there is an event to process.
 		virtual void handleEvent(const sf::Event& event) = 0;
 
 	protected:

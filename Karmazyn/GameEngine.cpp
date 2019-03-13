@@ -12,21 +12,24 @@ namespace Karmazyn
 		m_Config(ConfigSettings::cConfigFilesToReadInOrder)
 	{
 		sf::ContextSettings contextSettings;
+		int windowStyle = m_Config.get<int>(Configs::RenderWindowStyle, sf::Style::None | sf::Style::Fullscreen);
 
 		m_RenderWindow.create(
 			sf::VideoMode(
 				m_Config.get<int>(Configs::ResolutionX, 1024),
 				m_Config.get<int>(Configs::ResolutionY, 768)
 			),
-			"Karmazyn", 
-			sf::Style::None,
-			contextSettings
-		); // TODO: set style to sf::Style::Fullscreen | sf::Style::None when fitting
+			"Karmazyn", windowStyle
+		); 
 
-		m_RenderWindow.setFramerateLimit(
-			m_Config.get<int>(Configs::FrameRateCap, 60)
-		);
+		m_RenderWindow.setVerticalSyncEnabled(m_Config.get<bool>(Configs::VSync, false));
+		m_RenderWindow.setFramerateLimit(m_Config.get<int>(Configs::FrameRateCap, 60));
+		m_RenderWindow.requestFocus();
 
+		// consider abstracting this out, to reduce GameEngine include hell:
+		// Move gamestatestack out to it's own class, create functions for pushing/poping gamestates into it through predefined strings(?)
+		// like "LoadingMenu" -> GameState_LoadingMenu
+		// But this should be compile time checked (for invalid strings) and done
 		m_GameStates.emplace(
 			std::make_unique<GameState_LoadingMenu>(*this)
 		);

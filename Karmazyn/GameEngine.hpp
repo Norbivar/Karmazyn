@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "GameState/IGameState.hpp"
+#include "AssetManager/AssetManager.hpp"
 
 namespace Karmazyn
 {
@@ -19,7 +20,7 @@ namespace Karmazyn
 		class GameStateStack
 		{
 		public:
-			void emplace(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.emplace(std::move(what)); }
+			void emplace(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.emplace(std::forward<std::unique_ptr<IGameState>>(what)); }
 			void pop() { m_UnderlyingStack.pop(); }
 			//void push(std::unique_ptr<IGameState>&& what) { m_UnderlyingStack.push(what); }
 
@@ -41,10 +42,11 @@ namespace Karmazyn
 
 		int Run();
 
-		// Stops the render thread (and joins+destroys), and closes the render window.
+		// Stops the render thread (and joins+destroys), and closes the render window, effectively closing the whole program.
 		void Stop();
 
 		sf::RenderWindow& getRenderWindow() { return m_RenderWindow; }
+		AssetManager& getAssetManager()     { return m_Assets; }
 	private:
 		GameEngine(const GameEngine&) = delete;
 		GameEngine(GameEngine&&) = delete;
@@ -53,6 +55,7 @@ namespace Karmazyn
 
 		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
+		AssetManager m_Assets;
 
 		// This thread:
 		// 1. clears renderwindow
