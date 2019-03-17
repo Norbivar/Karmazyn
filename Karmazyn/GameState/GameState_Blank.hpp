@@ -10,8 +10,8 @@ namespace Karmazyn
 		GameState_Blank(GameEngine& engine) : IGameState(engine) {}
 		~GameState_Blank() override { }
 
-		void update(uint64_t diff) override { }
-		void render() override { }
+		void update(float diff) override { }
+		void render() const override { }
 		void handleEvent(const sf::Event& event) override { }
 	};
 }

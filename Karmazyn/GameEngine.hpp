@@ -9,7 +9,7 @@
 
 namespace Karmazyn
 {
-	class AssetManager; class GameStateStack;
+	class AssetManager; class GUIManager; class GameStateStack;
 
 	class GameEngine
 	{
@@ -24,6 +24,7 @@ namespace Karmazyn
 
 		sf::RenderWindow& getRenderWindow() { return m_RenderWindow; }
 		AssetManager& getAssetManager()     { return *m_Assets; }
+		GUIManager&   getUIManager()        { return *m_GUI; }
 	private:
 		GameEngine(const GameEngine&) = delete;
 		GameEngine(GameEngine&&) = delete;
@@ -35,6 +36,7 @@ namespace Karmazyn
 		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
 		std::unique_ptr<AssetManager> m_Assets;
+		std::unique_ptr<GUIManager>   m_GUI;
 
 		// This thread:
 		// 1. clears renderwindow

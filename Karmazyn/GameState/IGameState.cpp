@@ -2,5 +2,5 @@
 #include "IGameState.hpp"
 
 Karmazyn::IGameState::IGameState(GameEngine & engine) :
-	m_Engine(engine)
+	theEngine(engine)
 { }

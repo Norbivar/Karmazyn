@@ -12,13 +12,12 @@ namespace Karmazyn
 	public:
 		GameStateStack(GameEngine& engine);
 
-		void emplace(std::unique_ptr<IGameState>&& what);
+		void push(std::unique_ptr<IGameState>&& what);
 		void pop();
 
 		std::unique_ptr<IGameState>& top();
 
 	private:
-		std::unique_ptr<IGameState> m_Default;
 		std::stack<std::unique_ptr<IGameState>> m_UnderlyingStack;
 
 		friend class GameEngine;
