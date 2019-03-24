@@ -1,5 +1,4 @@
 #include "AssetManager.hpp"
-#include <SFML/Graphics.hpp>
 
 namespace Karmazyn
 {
@@ -25,7 +24,7 @@ namespace Karmazyn
 
 	}
 
-	size_t AssetManager::signalUnusedCacheFlush()
+	size_t AssetManager::requestUnusedCacheFlush()
 	{
 		return
 			m_TextureAssets.onRequestFlushUnused()

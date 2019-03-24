@@ -53,7 +53,7 @@ namespace Karmazyn
 			return m_TextureAssets.acquire(asset_file_name);
 		}
 
-		size_t signalUnusedCacheFlush();
+		size_t requestUnusedCacheFlush();
 
 	private:
 		AssetContainer<sf::Texture> m_TextureAssets;
