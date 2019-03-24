@@ -3,6 +3,8 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+SET(DEBUG_INFO true)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(Project_BUILD_DEBUG true)
 else() #if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -58,5 +60,10 @@ endif()
 #	optimized ${SFML_ALL_LIBS_RELEASE} 
 #	debug ${SFML_ALL_LIBS_DEBUG}
 #)
-
+if(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # TODO: create the equivalent for other compilers?
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FULL /Z7 /INCREMENTAL:NO /OPT:REF /OPT:ICF /RTC1")
+		message("ADDING DEBUG INFORMATION: ${CMAKE_EXE_LINKER_FLAGS}")
+	endif()
+endif()
 message("Compile options: REL: ${CMAKE_CXX_FLAGS_RELEASE} | DEB: ${CMAKE_CXX_FLAGS_DEBUG}")
