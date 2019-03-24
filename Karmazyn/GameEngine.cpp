@@ -3,23 +3,24 @@
 
 #include "GameState/GameState_LoadingMenu.hpp"
 #include "AssetManager/AssetManager.hpp"
-#include "GUIManager/GUIManager.hpp"
+#include "UIManager/UIManager.hpp"
 #include "GameStateStack.hpp"
 
 namespace Karmazyn
 {
 	GameEngine::GameEngine() :
-		m_GUI        { nullptr },
+		m_UI        { nullptr },
 
-		m_IsRunning  { false },
+		m_RunRenderThread { true },
+
 		m_Assets     { std::make_unique<AssetManager>() },
 		m_GameStates { std::make_unique<GameStateStack>(*this) },
 		m_Config     { ConfigSettings::cConfigFilesToReadInOrder }
 	{
 		sf::ContextSettings contextSettings;
-		contextSettings.majorVersion = 2;
-		contextSettings.minorVersion = 8;
-		theLog->info("Using OpenGL: {}.{}", contextSettings.majorVersion, contextSettings.minorVersion);
+		contextSettings.majorVersion = 3;
+		contextSettings.minorVersion = 2;
+		contextSettings.attributeFlags = sf::ContextSettings::Default;
 		
 		int windowStyle = m_Config.get<int>(Configs::RenderWindowStyle, sf::Style::None | sf::Style::Fullscreen);
 
@@ -30,13 +31,16 @@ namespace Karmazyn
 			),
 			"Karmazyn", windowStyle, contextSettings
 		); 
-
+		theLog->info("Using OpenGL: {}.{}",
+			m_RenderWindow.getSettings().majorVersion,
+			m_RenderWindow.getSettings().minorVersion
+		);
 		m_RenderWindow.setMouseCursorVisible(false);
 		m_RenderWindow.setVerticalSyncEnabled(m_Config.get<bool>(Configs::VSync, false));
 		m_RenderWindow.setFramerateLimit(m_Config.get<int>(Configs::FrameRateCap, 60));
 		m_RenderWindow.requestFocus();
 
-		m_GUI = std::make_unique<GUIManager>(*this); // needs to be initialized after RenderWindow setup
+		m_UI = std::make_unique<UIManager>(*this); // needs to be initialized after RenderWindow setup
 
 		// consider abstracting this out, to reduce GameEngine dependency hell:
 		// Move gamestatestack out to it's own class, create functions for pushing/poping gamestates into it through predefined strings(?)
@@ -51,25 +55,20 @@ namespace Karmazyn
 
 	}
 	int GameEngine::Run()
-	{
-		if (m_IsRunning)
-		{
-			theLog->warn("GameEngine Run() was called while it was already running!");
-			return 1;
-		}
-		m_IsRunning = true;
-			
+	{		
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
 
 		m_RenderWindow.setActive(false);
 		m_RenderThread = std::make_unique<std::thread>([&]()
 		{
+			m_RenderWindow.setActive(true);
 			while (m_RunRenderThread.load(std::memory_order::memory_order_relaxed)) // this should be just optimal 
 			{
 				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
-				m_RenderWindow.clear(sf::Color::Black);
+				m_RenderWindow.clear(sf::Color::White);
 				m_GameStates->top()->render();
+				m_UI->draw();
 				m_RenderWindow.display();
 			}
 		});
@@ -92,36 +91,32 @@ namespace Karmazyn
 			diff += clock.restart().asSeconds();
 
 			propagnateEvent = m_RenderWindow.pollEvent(polledEvent);
-			if (polledEvent.type == sf::Event::Closed)
-				m_RenderWindow.close();
 
 			auto& top = m_GameStates->top();
 			if (propagnateEvent)
 			{
 				top->handleEvent(polledEvent);
 			}
-			m_GUI->getSystem().injectTimePulse(diff);
 
 			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
 			{
+				m_UI->getSystem().injectTimePulse(SEC_BETWEEN_TICKS);
 				top->update(SEC_BETWEEN_TICKS);
 				diff -= SEC_BETWEEN_TICKS;
 			}
 		}
+		Stop();
 		theLog->info("GameEngine stopping!");
 		return 0;
 	}
 	void GameEngine::Stop()
 	{
-		if (m_IsRunning)
+		m_RunRenderThread.store(false, std::memory_order::memory_order_relaxed);
+		if (m_RenderThread)
 		{
-			m_RunRenderThread.store(false, std::memory_order::memory_order_relaxed);
 			m_RenderThread->join();
 			m_RenderThread.reset();
-			m_IsRunning = false;
-
-			m_RenderWindow.close();
 		}
-		else theLog->warn("GameEngine Stop() was called while not running!");
+		m_RenderWindow.close();
 	}
 }

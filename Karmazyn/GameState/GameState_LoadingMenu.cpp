@@ -2,18 +2,23 @@
 #include <algorithm>
 #include <Logger.hpp>
 #include "../Globals.hpp"
-#include "../GUIManager/GUIManager.hpp"
+#include "../GameEngine.hpp"
+#include "../UIManager/UIManager.hpp"
+#include "../GameStateStack.hpp"
+#include "GameState_MainMenu.hpp"
+
 
 namespace Karmazyn
 {
 	GameState_LoadingMenu::GameState_LoadingMenu(GameEngine& engine) :
 		IGameState(engine),
-		theGUI(engine.getUIManager()),
+		theUI(engine.getUIManager()),
 
+		// TODO: are these necessary? I mean, CEGUI will throw exceptions if it cannot the given child, so...
 		m_LoadingGUIRoot(nullptr), m_VersionLabel(nullptr), m_TippLabel(nullptr), m_LoadingLabel(nullptr), m_LoadingProgressbar(nullptr)
 	{
-		CEGUI::Window* root = CEGUI::System::getSingletonPtr()->getDefaultGUIContext().getRootWindow();
-		m_LoadingGUIRoot = CEGUI::WindowManager::getSingleton().loadLayoutFromFile(Settings::GUI::LoadingScreenLayoutName, "layouts");
+		CEGUI::Window* root = theUI.getSystem().getDefaultGUIContext().getRootWindow();
+		m_LoadingGUIRoot = static_cast<CEGUI::Window*>(root->getChildElement("LoadingBackgroundImage"));
 
 		m_VersionLabel = m_LoadingGUIRoot->getChildElement("VersionLabel");
 		m_VersionLabel->setProperty("Text", BuildVersion);
@@ -30,30 +35,18 @@ namespace Karmazyn
 		m_TippLabel = m_LoadingGUIRoot->getChildElement("TippLabel");
 		m_TippLabel->setProperty("Text", determineTippText());
 
-		root->addChild(m_LoadingGUIRoot);
+		m_LoadingGUIRoot->show();
 	}
 	GameState_LoadingMenu::~GameState_LoadingMenu()
 	{
-		theGUI.getWindowManager().destroyWindow(m_LoadingGUIRoot);
+	
 	}
 #pragma region IGameState_Implementation
 
 	void GameState_LoadingMenu::handleEvent(const sf::Event& event)
 	{
-		if (theGUI.handleEvent(event)) // GUI event will always come first
+		if (theUI.handleEvent(event)) // GUI event will always come first
 			return;
-		
-		switch (event.type)
-		{
-			case sf::Event::MouseButtonReleased:
-			{
-				if (event.mouseButton.button == sf::Mouse::Button::Right)
-				{
-					theEngine.Stop();
-				}
-				break;
-			}
-		}
 	}
 	std::string GameState_LoadingMenu::determineTippText()
 	{
@@ -65,15 +58,18 @@ namespace Karmazyn
 	}
 	std::string GameState_LoadingMenu::determineLoadingText()
 	{
-		return std::string("LAL");
+		return std::string("Loading Game Assets ...");
 	}
 	void GameState_LoadingMenu::onLoadingDone(const CEGUI::EventArgs& /*e*/)
 	{
-		theLog->info("LOADING DONE!");
+		m_LoadingLabel->setProperty("Text", "DONE!");
+		std::unique_ptr<IGameState> swapper = std::make_unique<GameState_MainMenu>(theEngine);
+		//theUI.getWindowManager().destroyWindow(m_LoadingGUIRoot);
+		theEngine.getGameStateStack().swapTop(swapper);
 	}
 	void GameState_LoadingMenu::render() const // called by a different thread, but .draw() takes const ref, so it should be fine
 	{
-		theGUI.draw();
+// 		theUI.draw();
 	}
 	void GameState_LoadingMenu::update(float diff)
 	{

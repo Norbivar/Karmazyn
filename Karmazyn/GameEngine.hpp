@@ -9,7 +9,7 @@
 
 namespace Karmazyn
 {
-	class AssetManager; class GUIManager; class GameStateStack;
+	class AssetManager; class UIManager; class GameStateStack;
 
 	class GameEngine
 	{
@@ -22,9 +22,11 @@ namespace Karmazyn
 		// Stops the render thread (and joins+destroys), and closes the render window, effectively closing the whole program.
 		void Stop();
 
-		sf::RenderWindow& getRenderWindow() { return m_RenderWindow; }
-		AssetManager& getAssetManager()     { return *m_Assets; }
-		GUIManager&   getUIManager()        { return *m_GUI; }
+		sf::RenderWindow& getRenderWindow()   { return m_RenderWindow; }
+		AssetManager&     getAssetManager()   { return *m_Assets; }
+		UIManager&        getUIManager()      { return *m_UI; }
+		GameStateStack&   getGameStateStack() { return *m_GameStates; }
+
 	private:
 		GameEngine(const GameEngine&) = delete;
 		GameEngine(GameEngine&&) = delete;
@@ -36,7 +38,7 @@ namespace Karmazyn
 		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
 		std::unique_ptr<AssetManager> m_Assets;
-		std::unique_ptr<GUIManager>   m_GUI;
+		std::unique_ptr<UIManager>    m_UI;
 
 		// This thread:
 		// 1. clears renderwindow

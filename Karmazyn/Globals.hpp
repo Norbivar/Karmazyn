@@ -52,7 +52,12 @@ namespace Karmazyn
 		namespace GUI
 		{
 			const std::string AssetsRootPath = "./data/gui";
-			const std::string LoadingScreenLayoutName = "LoadingGUI.layout";
+			// This seems to fix my problems of "loading-while-rendering" buggy, so I'll rather do this.
+			constexpr std::array<const char*, 2> LayoutsToLoad =
+			{
+				"LoadingGUI.layout",
+				"MainMenuGUI.layout",
+			};
 			constexpr const char* const SchemeName = "karmazyn.scheme";
 		}
 	}
