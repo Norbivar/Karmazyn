@@ -1,20 +1,22 @@
-#include "GUIManager.hpp"
-#include "../Globals.hpp"
+#include "UIManager.hpp"
+
 #include <Logger.hpp>
+
+#include "GameEngine.hpp"
+#include "../Globals.hpp"
 
 namespace Karmazyn
 {
-	GUIManager::GUIManager(GameEngine& engine) :
-		theEngine       (engine),
+	UIManager::UIManager(GameEngine& engine) :
+		theEngine       {engine},
 		//pMyWindow(window),
-		m_Renderer      (CEGUI::OpenGLRenderer::bootstrapSystem()),
-		m_System        (*CEGUI::System::getSingletonPtr()),
-		m_WindowManager (*CEGUI::WindowManager::getSingletonPtr())
+		m_Renderer      {CEGUI::OpenGL3Renderer::bootstrapSystem()},
+		m_System        {*CEGUI::System::getSingletonPtr()},
+		m_WindowManager {*CEGUI::WindowManager::getSingletonPtr()}
 	{
 		try
 		{
-			const auto& a = m_System.getDefaultGUIContext();
-
+			m_Renderer.enableExtraStateSettings(true);
 			// First set up the default directories that the CEGUI resource provider will use.
 			CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*> (
 				CEGUI::System::getSingleton().getResourceProvider());
@@ -41,13 +43,11 @@ namespace Karmazyn
 			CEGUI::FontManager::getSingleton().createFromFile("DejaVuSans-10.font");  // Default font loading.
 			m_System.getDefaultGUIContext().setDefaultFont("DejaVuSans-10");        // Default font loading.
 
-
 			CEGUI::SchemeManager::getSingleton().createFromFile(Settings::GUI::SchemeName, "schemes"); // Load the Main Menu Scheme.
 
 			// Setting default cursor to display.
 			CEGUI::MouseCursor& cursor = m_System.getDefaultGUIContext().getMouseCursor();
 			cursor.setDefaultImage("WindowsLook/MouseArrow");
-			cursor.show();
 
 			// Now That CEGUI has been set up, we initialize the InputTranslators.
 			m_MouseInputTranslator = {
@@ -60,6 +60,13 @@ namespace Karmazyn
 			CEGUI::Window* root = m_WindowManager.createWindow("DefaultWindow", "root");
 			m_System.getDefaultGUIContext().setRootWindow(root);
 
+			for (std::string layoutname : Settings::GUI::LayoutsToLoad)
+			{
+				auto* layout = m_WindowManager.loadLayoutFromFile(layoutname, "layouts");
+				layout->hide();
+				root->addChild(layout);
+			}
+
 			// TODO: set up the KeyboardInputTranslator as well when we actually have things that need input.
 			theLog->info("CEGUI set up correctly!");
 		}
@@ -69,10 +76,50 @@ namespace Karmazyn
 			// TODO: throw further?
 		}
 	}
-	bool GUIManager::handleEvent(const sf::Event& ev)
+	bool UIManager::handleEvent(const sf::Event& ev)
 	{
 		switch (ev.type)
 		{
+			case sf::Event::MouseMoved:
+			{
+				m_System.getDefaultGUIContext().injectMousePosition(
+					ev.mouseMove.x,
+					ev.mouseMove.y
+				);
+				return true; // Game should not be concerned with the mouse movement 
+			}
+			case sf::Event::MouseButtonPressed:
+			{
+				switch (ev.mouseButton.button)
+				{
+				case sf::Mouse::Button::Left:
+					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::LeftButton);
+					break;
+				case sf::Mouse::Button::Right:
+					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::RightButton);
+					break;
+				case sf::Mouse::Button::Middle:
+					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::MiddleButton);
+					break;
+				}
+				return true;
+			}
+			case sf::Event::MouseButtonReleased:
+			{
+				switch (ev.mouseButton.button)
+				{
+				case sf::Mouse::Button::Left:
+					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::LeftButton);
+					break;
+				case sf::Mouse::Button::Right:
+					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::RightButton);
+					break;
+				case sf::Mouse::Button::Middle:
+					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::MiddleButton);
+					break;
+				}
+				return true; // Game should not be concerned with the mouse movement 
+			}
 			case sf::Event::Resized:
 			{
 				m_System.notifyDisplaySizeChanged({
@@ -82,19 +129,10 @@ namespace Karmazyn
 				);
 				return false;
 			}
-
-			case sf::Event::MouseMoved:
-			{
-				m_System.getDefaultGUIContext().injectMousePosition(
-					ev.mouseMove.x,
-					ev.mouseMove.y
-				);
-				return true; // Game should not be concerned with the mouse movement 
-			}
 			return false;
 		}
 	}
-	void GUIManager::handleNativeMouseMove(const sf::Vector2i& ev)
+	void UIManager::handleNativeMouseMove(const sf::Vector2i& ev)
 	{
 		m_System.getDefaultGUIContext().injectMousePosition(
 			ev.x,

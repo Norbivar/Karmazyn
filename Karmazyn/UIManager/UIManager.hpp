@@ -2,31 +2,39 @@
 
 #include <unordered_map>
 #include <CEGUI/CEGUI.h>
-#include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
+#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
+
+#include <atomic>
 
 namespace Karmazyn
 {
 	class GameEngine;
 
 	// Mainly a wrapper around the CEGUI things.
-	class GUIManager
+	class UIManager
 	{
 	public:
-		GUIManager(GameEngine& engine);
-		~GUIManager() = default;
+		std::atomic_bool testatom = false;
 
-		GUIManager(const GUIManager&) = delete;
-		GUIManager(GUIManager&&) = delete;
+		UIManager(GameEngine& engine);
+		~UIManager() = default;
 
-		GUIManager& operator=(const GUIManager&) = delete;
-		GUIManager& operator=(GUIManager&&) = delete;
+		UIManager(const UIManager&) = delete;
+		UIManager(UIManager&&) = delete;
+
+		UIManager& operator=(const UIManager&) = delete;
+		UIManager& operator=(UIManager&&) = delete;
 
 		CEGUI::WindowManager& getWindowManager() { return m_WindowManager; }
+
 		// Renders all active Windows.
 		void draw() const { m_System.renderAllGUIContexts(); }
+
+		void destroyWindow(CEGUI::Window* win) { m_WindowManager.destroyWindow(win); }
+
 		// Returns a reference to the singleton object CEGUI::System.
 		// Also a shortcut for 'CEGUI::System::getSingletonPtr()'
 		CEGUI::System& getSystem() { return m_System; }
@@ -42,13 +50,9 @@ namespace Karmazyn
 
 	private:
 		// Non-owning pointers to assets.
-		//sf::RenderWindow&		pMyWindow;
-
-		CEGUI::OpenGLRenderer&  m_Renderer;
+		CEGUI::OpenGL3Renderer& m_Renderer;
 		CEGUI::System&          m_System;
 		CEGUI::WindowManager&   m_WindowManager;
-
-		//std::unique_ptr<GUI_MainMenuHandler> pMyMainMenu;
 
 		GameEngine& theEngine;
 
