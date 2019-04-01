@@ -1,10 +1,14 @@
 #include <fstream>
-
 #include "Config.hpp"
-#include "Logger.hpp"
 
 namespace Karmazyn
 {
+	Config* Config::GetConfig()
+	{
+		static Config c{ConfigSettings::cConfigFilesToReadInOrder};
+		return &c;
+	}
+
 	Config::~Config()
 	{
 		saveAll();

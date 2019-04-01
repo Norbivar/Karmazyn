@@ -8,7 +8,7 @@ namespace Configs
 	constexpr const char* const FrameRateCap        = "maxfps";
 	constexpr const char* const RenderWindowStyle   = "renderwindowstyle";
 	constexpr const char* const VSync               = "vsync";
-
+		
 
 	//DEBUG configs:
 	constexpr const char* const PlusTickCount = "debug1";

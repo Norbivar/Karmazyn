@@ -19,23 +19,32 @@ namespace Karmazyn
 
 		int Run();
 
-		// Stops the render thread (and joins+destroys), and closes the render window, effectively closing the whole program.
-		void Stop();
-
 		sf::RenderWindow& getRenderWindow()   { return m_RenderWindow; }
 		AssetManager&     getAssetManager()   { return *m_Assets; }
 		UIManager&        getUIManager()      { return *m_UI; }
 		GameStateStack&   getGameStateStack() { return *m_GameStates; }
 
+		void changeScreenSize(const unsigned int newWidth, const unsigned int newHeight);
+		void changeVerticalSynced(bool enabled);
+
+		template<typename Func>
+		void applyFunctorAndRestartRendering(Func f)
+		{
+			stopRenderThread();
+			f();
+			createRenderThread();
+		}
+
+		// Stops the render thread (and joins+destroys), and closes the render window, effectively closing the whole program.
+		void stopRenderThread();
 	private:
 		GameEngine(const GameEngine&) = delete;
 		GameEngine(GameEngine&&) = delete;
 		const GameEngine& operator=(const GameEngine&) = delete;
 		const GameEngine& operator=(GameEngine&&) = delete;
 
-		bool m_IsRunning;
+		void createRenderThread();
 
-		Config m_Config;
 		sf::RenderWindow m_RenderWindow;
 		std::unique_ptr<AssetManager> m_Assets;
 		std::unique_ptr<UIManager>    m_UI;

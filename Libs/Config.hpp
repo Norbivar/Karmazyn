@@ -5,8 +5,10 @@
 #include <map>
 #include <exception>
 
+#include "Logger.hpp"
 #include "LibSettings.hpp"
 
+#define theConfig Karmazyn::Config::GetConfig()
 namespace Karmazyn
 {
 	struct ConfigNotFoundException : public std::exception
@@ -23,6 +25,8 @@ namespace Karmazyn
 	class Config
 	{
 	public:
+		static Config* GetConfig();
+
 		template<typename Iterable>
 		Config(const Iterable& file_name_list)
 		{
@@ -62,7 +66,7 @@ namespace Karmazyn
 			{
 				return boost::lexical_cast<T>(node->second);
 			}
-			throw ConfigNotFoundException(std::string("CONFIG: Could not find: [") + std::string(root) + std::string("] ") + std::string(configname));
+			throw ConfigNotFoundException(std::string("CONFIG: Could not find:" + std::string(configname)));
 		}
 
 		template<typename T>

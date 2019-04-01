@@ -16,7 +16,6 @@ namespace Karmazyn
 			"./conf.ini"
 		};
 		
-		const std::regex cConfigRootRegex       ("^\\[[a-zA-Z]+\\]$");
 		const std::regex cConfigValidLineRegex  ("^[a-zA-Z_]+\\=.*");
 
 		constexpr bool cLogUnsuccessfulConfigGets = false;
