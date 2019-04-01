@@ -1,6 +1,7 @@
 #include "GameState_MainMenu.hpp"
 #include <Logger.hpp>
 
+#include "ConfigList.hpp"
 #include "../Globals.hpp"
 #include "../GameEngine.hpp"
 #include "../UIManager/UIManager.hpp"
@@ -27,12 +28,37 @@ namespace Karmazyn
 
 			m_QuitGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("QuitGameButton"));
 			m_QuitGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onQuitGameClicked, this));
-
-			m_VersionLabel = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("MenuVersionLabel"));
-			m_VersionLabel->setProperty("Text", BuildVersion);
 		}
 
+		m_OptionsWindow = static_cast<CEGUI::Window*>(m_MainMenuRoot->getChildElement("OptionsWindow"));
+		{
+			m_OptionVsyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VsyncCheckbox"));
+			// Handle checkbox setting 
+			{
+				bool toggled = theConfig->get<bool>(Configs::VSync);
+				m_OptionVsyncCheckbox->setSelected(toggled);
+				m_OptionVsyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
+				{
+					bool newValue = m_OptionVsyncCheckbox->isSelected();
+					theConfig->set<bool>(Configs::VSync, newValue);
+					//theEngine.changeVerticalSynced(newValue);
+				}));
+			}
+
+			// Handle close window button on Options Window
+			m_OptionsWindow->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber([&]()
+			{
+				m_OptionsWindow->hide();
+			}));
+		}
+
+		m_VersionLabel = m_MainMenuRoot->getChildElement("MenuVersionLabel");
+		m_VersionLabel->setProperty("Text", BuildVersion);
+
 		m_MainMenuRoot->show();
+		m_OptionsWindow->hide();
+
+		m_MainMenuRoot->activate();
 	}
 
 	GameState_MainMenu::~GameState_MainMenu()
@@ -50,11 +76,14 @@ namespace Karmazyn
 	}
 	void GameState_MainMenu::onOptionsClicked(const CEGUI::EventArgs &)
 	{
-		theLog->info("OPTIONS CLICKED");
+		if(m_OptionsWindow->isVisible())
+			m_OptionsWindow->hide();
+		else
+			m_OptionsWindow->show();
 	}
 	void GameState_MainMenu::onQuitGameClicked(const CEGUI::EventArgs &)
 	{
-		theEngine.Stop();
+		theEngine.stopRenderThread();
 	}
 
 	void GameState_MainMenu::update(float diff)

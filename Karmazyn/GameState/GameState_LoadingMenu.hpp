@@ -26,7 +26,6 @@ namespace Karmazyn
 		// Root of the loaded Layout (which is a StaticImage -> the background picture)
 		// The tabulation of rows show parent-child relationships
 		CEGUI::Window* m_LoadingGUIRoot;
-			CEGUI::NamedElement*      m_VersionLabel;
 			CEGUI::NamedElement*      m_TippLabel;
 			CEGUI::ProgressBar*       m_LoadingProgressbar;
 				CEGUI::NamedElement*      m_LoadingLabel;

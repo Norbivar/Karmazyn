@@ -1,5 +1,4 @@
 #include "GameState_LoadingMenu.hpp"
-#include <algorithm>
 #include <Logger.hpp>
 #include "../Globals.hpp"
 #include "../GameEngine.hpp"
@@ -12,16 +11,10 @@ namespace Karmazyn
 {
 	GameState_LoadingMenu::GameState_LoadingMenu(GameEngine& engine) :
 		IGameState(engine),
-		theUI(engine.getUIManager()),
-
-		// TODO: are these necessary? I mean, CEGUI will throw exceptions if it cannot the given child, so...
-		m_LoadingGUIRoot(nullptr), m_VersionLabel(nullptr), m_TippLabel(nullptr), m_LoadingLabel(nullptr), m_LoadingProgressbar(nullptr)
+		theUI(engine.getUIManager())
 	{
 		CEGUI::Window* root = theUI.getSystem().getDefaultGUIContext().getRootWindow();
 		m_LoadingGUIRoot = static_cast<CEGUI::Window*>(root->getChildElement("LoadingBackgroundImage"));
-
-		m_VersionLabel = m_LoadingGUIRoot->getChildElement("VersionLabel");
-		m_VersionLabel->setProperty("Text", BuildVersion);
 
 		m_LoadingProgressbar = static_cast<CEGUI::ProgressBar*>(m_LoadingGUIRoot->getChildElement("LoadingProgressBar"));
 		m_LoadingProgressbar->setProgress(0.0f);
@@ -41,16 +34,9 @@ namespace Karmazyn
 	{
 	
 	}
-#pragma region IGameState_Implementation
-
-	void GameState_LoadingMenu::handleEvent(const sf::Event& event)
-	{
-		if (theUI.handleEvent(event)) // GUI event will always come first
-			return;
-	}
 	std::string GameState_LoadingMenu::determineTippText()
 	{
-		constexpr std::array<const char*, 2> LoadingScreenTipps = {
+		std::array<const char*, 2> LoadingScreenTipps = {
 			"TODO: these tipps will need to be updated, once there is something to do, as they are pretty much just placeholders, showing the overall picture of the loading screen.",
 			"Lorem ipsum doloret sit amet, menjünk dógozni."
 		};
@@ -66,6 +52,14 @@ namespace Karmazyn
 		std::unique_ptr<IGameState> swapper = std::make_unique<GameState_MainMenu>(theEngine);
 		//theUI.getWindowManager().destroyWindow(m_LoadingGUIRoot);
 		theEngine.getGameStateStack().swapTop(swapper);
+	}
+
+#pragma region IGameState_Implementation
+
+	void GameState_LoadingMenu::handleEvent(const sf::Event& event)
+	{
+		if (theUI.handleEvent(event)) // GUI event will always come first
+			return;
 	}
 	void GameState_LoadingMenu::render() const // called by a different thread, but .draw() takes const ref, so it should be fine
 	{

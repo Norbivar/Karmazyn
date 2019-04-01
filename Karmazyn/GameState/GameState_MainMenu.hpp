@@ -33,6 +33,7 @@ namespace Karmazyn
 				CEGUI::PushButton*      m_QuitGameButton;
 				CEGUI::NamedElement*    m_VersionLabel;
 			CEGUI::Window*      m_OptionsWindow;
+				CEGUI::ToggleButton*    m_OptionVsyncCheckbox; // nested in VsyncLabel
 			//TODO: finish options window
 
 		void onNewGameClicked (const CEGUI::EventArgs& /*e*/);
