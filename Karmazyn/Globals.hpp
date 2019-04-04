@@ -5,6 +5,8 @@
 
 namespace Karmazyn
 {
+	constexpr const char* const BuildVersion = "v0.02";
+
 	namespace Utility
 	{
 
@@ -42,7 +44,6 @@ namespace Karmazyn
 			return it;
 		}
 	}
-	constexpr const char* const BuildVersion = "v0.1";
 	namespace Constants
 	{
 

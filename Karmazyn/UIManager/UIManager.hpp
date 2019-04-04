@@ -17,8 +17,6 @@ namespace Karmazyn
 	class UIManager
 	{
 	public:
-		std::atomic_bool testatom = false;
-
 		UIManager(GameEngine& engine);
 		~UIManager() = default;
 
