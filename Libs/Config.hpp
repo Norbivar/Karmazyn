@@ -7,6 +7,7 @@
 
 #include "Logger.hpp"
 #include "LibSettings.hpp"
+#include "ConfigList.hpp"
 
 #define theConfig Karmazyn::Config::GetConfig()
 namespace Karmazyn
@@ -21,7 +22,6 @@ namespace Karmazyn
 		
 		std::string msg;
 	};
-
 	class Config
 	{
 	public:
