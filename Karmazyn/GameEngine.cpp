@@ -9,36 +9,14 @@
 namespace Karmazyn
 {
 	GameEngine::GameEngine() :
-		m_UI        { nullptr },
+		m_Assets       { std::make_unique<AssetManager>() },
+		m_UI           { nullptr },
+		m_GameStates   { std::make_unique<GameStateStack>(*this) },
+		m_RenderWindow { },
 
-		m_RunRenderThread { false },
-
-		m_Assets     { std::make_unique<AssetManager>() },
-		m_GameStates { std::make_unique<GameStateStack>(*this) }
+		m_CoreLoopRunning { false }
 	{
-		sf::ContextSettings contextSettings;
-		contextSettings.majorVersion = 3;
-		contextSettings.minorVersion = 2;
-		contextSettings.attributeFlags = sf::ContextSettings::Default;
-		
-		int windowStyle = theConfig->get<int>(Configs::RenderWindowStyle, sf::Style::None | sf::Style::Fullscreen);
-
-		m_RenderWindow.create(
-			sf::VideoMode(
-				theConfig->get<int>(Configs::ResolutionX, 1024),
-				theConfig->get<int>(Configs::ResolutionY, 768)
-			),
-			"Karmazyn", windowStyle, contextSettings
-		); 
-		theLog->info("Using OpenGL: {}.{}",
-			m_RenderWindow.getSettings().majorVersion,
-			m_RenderWindow.getSettings().minorVersion
-		);
-		m_RenderWindow.setMouseCursorVisible(false);
-		m_RenderWindow.setVerticalSyncEnabled(theConfig->get<bool>(Configs::VSync, false));
-		m_RenderWindow.setFramerateLimit(theConfig->get<int>(Configs::FrameRateCap, 60));
-		m_RenderWindow.requestFocus();
-
+		m_RenderWindow.create_from_config();
 		m_UI = std::make_unique<UIManager>(*this); // needs to be initialized after RenderWindow setup
 
 		// consider abstracting this out, to reduce GameEngine dependency hell:
@@ -58,7 +36,7 @@ namespace Karmazyn
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
 
-		createRenderThread();
+		m_RenderWindow.createRenderThreadWith(RenderThreadReferencePasser(getUIManager(), getGameStateStack()));
 
 		bool propagnateEvent = false;
 		sf::Event polledEvent;
@@ -66,8 +44,9 @@ namespace Karmazyn
 		const float SEC_BETWEEN_TICKS = 1.0f / theConfig->get<float>(Configs::FrameRateCap, 60);
 		float diff = 0.0f;
 
+		m_CoreLoopRunning.store(true, std::memory_order::memory_order_relaxed);
 		// Main threads main game loop. Application will exit after this.
-		while (m_RenderWindow.isOpen())
+		while (m_CoreLoopRunning.load(std::memory_order::memory_order_relaxed))
 		{
 			if (!m_RenderWindow.hasFocus())
 			{
@@ -82,10 +61,15 @@ namespace Karmazyn
 			auto& top = m_GameStates->top();
 			if (propagnateEvent)
 			{
-				if (polledEvent.type != sf::Event::Resized)
-					top->handleEvent(polledEvent);
-
-				else changeScreenSize(polledEvent.size.width, polledEvent.size.height);
+				if (polledEvent.type == polledEvent.KeyReleased)
+				{
+					if (polledEvent.key.code == sf::Keyboard::F10)
+					{
+						theLog->info("f10 pressed!");
+						changeScreenSize(1600, 900);
+					}
+				}
+				else top->handleEvent(polledEvent);
 			}
 
 			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
@@ -95,10 +79,14 @@ namespace Karmazyn
 				diff -= SEC_BETWEEN_TICKS;
 			}
 		}
-		stopRenderThread();
 		m_RenderWindow.close();
 		theLog->info("GameEngine stopping!");
 		return 0;
+	}
+	void GameEngine::Stop()
+	{
+		m_RenderWindow.close(); // this will close the render window, which will in turn end the main loop and thus the program
+		m_CoreLoopRunning.store(false, std::memory_order::memory_order_relaxed);
 	}
 	void GameEngine::changeScreenSize(const unsigned int newWidth, const unsigned int newHeight)
 	{
@@ -106,42 +94,12 @@ namespace Karmazyn
 		newWidthFloat += newWidth;
 		newHeightFloat += newHeight;
 
-		m_RenderWindow.setSize({ newWidth, newHeight });
-		m_UI->getSystem().notifyDisplaySizeChanged(CEGUI::Sizef{ newWidthFloat, newHeightFloat });
-		theLog->info("Screen resolution changed to {}x{}", newWidth, newHeight);
+		m_RenderWindow.process(RenderWindowCommands::Resize{ newWidth, newHeight });
+ 		//m_UI->getSystem().notifyDisplaySizeChanged(CEGUI::Sizef{ newWidthFloat, newHeightFloat });
+		theLog->info("Screen resolution changed to {}x{} for next restart.", newWidth, newHeight);
 	}
 	void GameEngine::changeVerticalSynced(bool enabled)
 	{
-		applyFunctorAndRestartRendering([&]() {
-			m_RenderWindow.setVerticalSyncEnabled(enabled);
-		});
-	}
-	void GameEngine::stopRenderThread()
-	{
-		m_RunRenderThread.store(false, std::memory_order::memory_order_relaxed);
-		if (m_RenderThread)
-		{
-			m_RenderThread->join();
-			m_RenderThread.reset(nullptr);
-		}
-		m_RenderWindow.setActive(true);
-	}
-	void GameEngine::createRenderThread()
-	{
-		m_RenderWindow.setActive(false);
-		m_RunRenderThread.store(true, std::memory_order::memory_order_relaxed);
-		m_RenderThread = std::make_unique<std::thread>([&]()
-		{
-			m_RenderWindow.setActive(true);
-			while (m_RunRenderThread.load(std::memory_order::memory_order_relaxed)) // this should be just optimal 
-			{
-				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
-				m_RenderWindow.clear(sf::Color::White);
-				m_GameStates->top()->render();
-				m_UI->draw();
-				m_RenderWindow.display();
-			}
-			m_RenderWindow.setActive(false);
-		});
+		m_RenderWindow.process(RenderWindowCommands::ToggleVSync(enabled));
 	}
 }

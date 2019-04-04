@@ -32,18 +32,23 @@ namespace Karmazyn
 
 		m_OptionsWindow = static_cast<CEGUI::Window*>(m_MainMenuRoot->getChildElement("OptionsWindow"));
 		{
-			m_OptionVsyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VsyncCheckbox"));
+			m_OptionVSyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VSyncCheckbox"));
+			//     OPTIONS modification:
 			// Handle checkbox setting 
 			{
 				bool toggled = theConfig->get<bool>(Configs::VSync);
-				m_OptionVsyncCheckbox->setSelected(toggled);
-				m_OptionVsyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
+				m_OptionVSyncCheckbox->setSelected(toggled);
+				m_OptionVSyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
 				{
-					bool newValue = m_OptionVsyncCheckbox->isSelected();
-					theConfig->set<bool>(Configs::VSync, newValue);
-					//theEngine.changeVerticalSynced(newValue);
+					bool newValue = m_OptionVSyncCheckbox->isSelected();
+					theEngine.changeVerticalSynced(newValue);
+					m_RestartNotificationLabel->show();
 				}));
 			}
+
+			// OPTIONS end
+			m_RestartNotificationLabel = static_cast<CEGUI::Window*>(m_OptionsWindow->getChildElement("RestartNotificationLabel"));
+			m_RestartNotificationLabel->hide();
 
 			// Handle close window button on Options Window
 			m_OptionsWindow->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber([&]()
@@ -83,7 +88,7 @@ namespace Karmazyn
 	}
 	void GameState_MainMenu::onQuitGameClicked(const CEGUI::EventArgs &)
 	{
-		theEngine.stopRenderThread();
+		theEngine.Stop();
 	}
 
 	void GameState_MainMenu::update(float diff)

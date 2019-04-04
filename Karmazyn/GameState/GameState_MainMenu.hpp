@@ -4,7 +4,6 @@
 
 namespace Karmazyn
 {
-
 	class GameEngine; class UIManager;
 
 	class GameState_MainMenu : public IGameState
@@ -33,7 +32,8 @@ namespace Karmazyn
 				CEGUI::PushButton*      m_QuitGameButton;
 				CEGUI::NamedElement*    m_VersionLabel;
 			CEGUI::Window*      m_OptionsWindow;
-				CEGUI::ToggleButton*    m_OptionVsyncCheckbox; // nested in VsyncLabel
+				CEGUI::ToggleButton*    m_OptionVSyncCheckbox; // nested in VsyncLabel
+				CEGUI::Window*          m_RestartNotificationLabel;
 			//TODO: finish options window
 
 		void onNewGameClicked (const CEGUI::EventArgs& /*e*/);
