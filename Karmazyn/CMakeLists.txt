@@ -26,11 +26,11 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF) 
 find_package(Boost REQUIRED COMPONENTS filesystem) 
 
-set(SFML_DIR "./CMake/")
+set(SFML_DIR "../CMake/")
 set(SFML_STATIC_LIBRARIES FALSE)
 find_package(SFML REQUIRED)
 
-set(CEGUI_DIR "./CMake/")
+set(CEGUI_DIR "../CMake/")
 set(CEGUI_STATIC_LIBRARIES FALSE)
 find_package(CEGUI REQUIRED)
 
