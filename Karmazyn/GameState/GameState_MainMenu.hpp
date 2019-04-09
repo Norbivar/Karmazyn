@@ -33,6 +33,8 @@ namespace Karmazyn
 				CEGUI::NamedElement*    m_VersionLabel;
 			CEGUI::Window*      m_OptionsWindow;
 				CEGUI::ToggleButton*    m_OptionVSyncCheckbox; // nested in VsyncLabel
+				CEGUI::Editbox*         m_OptionResolutionWidth;
+				CEGUI::Editbox*         m_OptionResolutionHeight;
 				CEGUI::Window*          m_RestartNotificationLabel;
 			//TODO: finish options window
 

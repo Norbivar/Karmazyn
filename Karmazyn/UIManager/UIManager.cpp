@@ -86,7 +86,7 @@ namespace Karmazyn
 					ev.mouseMove.x,
 					ev.mouseMove.y
 				);
-				return true; // Game should not be concerned with the mouse movement 
+				return false; // infact, the game might (and probably will) have an outline for units/things under cursor, so indeed this should not block
 			}
 			case sf::Event::MouseButtonPressed:
 			{
@@ -120,6 +120,18 @@ namespace Karmazyn
 				}
 				return true; // Game should not be concerned with the mouse movement 
 			}
+			case sf::Event::KeyPressed:
+			{
+				const auto& key = m_KeyboardInputTranslator.translate(ev.key.code);
+				m_System.getDefaultGUIContext().injectKeyDown(key);
+				return false;
+			}
+			case sf::Event::KeyReleased:
+			{
+				const auto& key = m_KeyboardInputTranslator.translate(ev.key.code);
+				m_System.getDefaultGUIContext().injectKeyUp(key);
+				return false;
+			}
 			case sf::Event::Resized:
 			{
 				m_System.notifyDisplaySizeChanged({
@@ -131,6 +143,7 @@ namespace Karmazyn
 			}
 			return false;
 		}
+		return false; // every unhandled event will be passed to the GameEngine
 	}
 	void UIManager::handleNativeMouseMove(const sf::Vector2i& ev)
 	{

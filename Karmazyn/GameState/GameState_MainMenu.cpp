@@ -13,49 +13,59 @@ namespace Karmazyn
 		theUI(engine.getUIManager())
 	{
 		CEGUI::Window* root = CEGUI::System::getSingletonPtr()->getDefaultGUIContext().getRootWindow();
+
+
+		#pragma region WidgetInitializations
 		m_MainMenuRoot = static_cast<CEGUI::Window*>(root->getChildElement("MenuBackgroundImage"));
 
 		m_MainMenuWindow = m_MainMenuRoot->getChildElement("MainMenuWindow");
-		{
-			m_NewGameButton  = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("NewGameButton"));
-			m_NewGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onNewGameClicked, this));
 
-			m_LoadGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("LoadGameButton"));
-			m_LoadGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onLoadGameClicked, this));
-
-			m_OptionsButton  = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("OptionsButton"));
-			m_OptionsButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onOptionsClicked, this));
-
-			m_QuitGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("QuitGameButton"));
-			m_QuitGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onQuitGameClicked, this));
-		}
+		m_NewGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("NewGameButton"));
+		m_LoadGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("LoadGameButton"));
+		m_OptionsButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("OptionsButton"));
+		m_QuitGameButton = static_cast<CEGUI::PushButton*>(m_MainMenuWindow->getChildElement("QuitGameButton"));
 
 		m_OptionsWindow = static_cast<CEGUI::Window*>(m_MainMenuRoot->getChildElement("OptionsWindow"));
+		m_OptionResolutionWidth = static_cast<CEGUI::Editbox*>(m_OptionsWindow->getChildElementRecursive("ResolutionWidth"));
+		m_OptionResolutionWidth->setText(theConfig->get<std::string>(Configs::ResolutionX));
+
+		m_OptionResolutionHeight = static_cast<CEGUI::Editbox*>(m_OptionsWindow->getChildElementRecursive("ResolutionHeight"));
+		m_OptionResolutionHeight->setText(theConfig->get<std::string>(Configs::ResolutionY));
+
+		m_OptionVSyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VSyncCheckbox"));
+		bool toggled = theConfig->get<bool>(Configs::VSync);
+		m_OptionVSyncCheckbox->setSelected(toggled);
+
+		m_RestartNotificationLabel = static_cast<CEGUI::Window*>(m_OptionsWindow->getChildElement("RestartNotificationLabel"));
+		m_RestartNotificationLabel->hide();
+		#pragma endregion
+
+		#pragma region WidgetEventSubscriptors
+		m_NewGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onNewGameClicked, this));
+		m_LoadGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onLoadGameClicked, this));
+		m_OptionsButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onOptionsClicked, this));
+		m_QuitGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&GameState_MainMenu::onQuitGameClicked, this));
+
+		m_OptionResolutionWidth->subscribeEvent(CEGUI::Editbox::EventTextAccepted, CEGUI::Event::Subscriber([&]() 
 		{
-			m_OptionVSyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VSyncCheckbox"));
-			//     OPTIONS modification:
-			// Handle checkbox setting 
-			{
-				bool toggled = theConfig->get<bool>(Configs::VSync);
-				m_OptionVSyncCheckbox->setSelected(toggled);
-				m_OptionVSyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
-				{
-					bool newValue = m_OptionVSyncCheckbox->isSelected();
-					theEngine.changeVerticalSynced(newValue);
-					m_RestartNotificationLabel->show();
-				}));
-			}
+				theLog->info("TRIGGI");
+			
+		}));
+		
+		m_OptionVSyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
+		{
+			bool newValue = m_OptionVSyncCheckbox->isSelected();
+			theEngine.changeVerticalSynced(newValue);
+			m_RestartNotificationLabel->show();
+		}));
+		// Handle close window button on Options Window
+		m_OptionsWindow->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber([&]()
+		{
+			m_OptionsWindow->hide();
+		}));
 
-			// OPTIONS end
-			m_RestartNotificationLabel = static_cast<CEGUI::Window*>(m_OptionsWindow->getChildElement("RestartNotificationLabel"));
-			m_RestartNotificationLabel->hide();
+		#pragma endregion
 
-			// Handle close window button on Options Window
-			m_OptionsWindow->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber([&]()
-			{
-				m_OptionsWindow->hide();
-			}));
-		}
 
 		m_VersionLabel = m_MainMenuRoot->getChildElement("MenuVersionLabel");
 		m_VersionLabel->setProperty("Text", BuildVersion);
