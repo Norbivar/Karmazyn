@@ -1,11 +1,25 @@
 #pragma once
 #include <stack>
 #include <memory>
+#include <exception>
+#include <string>
 
 namespace Karmazyn
 {
 	// Helper class, providing a safer top() behaviour, that is guaranteed to return a valid reference.
 	class IGameState; class GameEngine;
+
+	class InvalidStateMachineTransitionException : public std::exception
+	{
+	public:
+		InvalidStateMachineTransitionException(const std::string& message) : m_Message(message) { }
+		const char* what() const throw ()
+		{
+			return m_Message.c_str();
+		}
+	private:
+		std::string m_Message;
+	};
 
 	class GameStateMachine
 	{

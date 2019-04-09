@@ -24,6 +24,7 @@ namespace Karmazyn
 			m_CurrentState.swap(m_HitStates.top());
 			m_HitStates.pop();
 		}
+		else throw InvalidStateMachineTransitionException("transitionBack() requested with empty stack!");
 	}
 
 	void GameStateMachine::clearHistory()
