@@ -9,12 +9,20 @@
 
 namespace Karmazyn
 {
-	// Translates keyboard event keycodes coming from SFML to CEGUI keycodes ready to be injected.
-	class KeyboardInputTranslator
+	// Translates keyboard and mouse events from their SFML ID to CEGUI used ID.
+	class SFMLtoCEGUIInputTranslator
 	{
 	public:
-		KeyboardInputTranslator()
+		SFMLtoCEGUIInputTranslator()
 		{
+			// Mouse buttons:
+			m_mapSFMouseButtonToCEGUIMouseButton.emplace(sf::Mouse::Button::Left,     CEGUI::MouseButton::LeftButton);
+			m_mapSFMouseButtonToCEGUIMouseButton.emplace(sf::Mouse::Button::Right,    CEGUI::MouseButton::RightButton);
+			m_mapSFMouseButtonToCEGUIMouseButton.emplace(sf::Mouse::Button::Middle,   CEGUI::MouseButton::MiddleButton);
+			m_mapSFMouseButtonToCEGUIMouseButton.emplace(sf::Mouse::Button::XButton1, CEGUI::MouseButton::X1Button);
+			m_mapSFMouseButtonToCEGUIMouseButton.emplace(sf::Mouse::Button::XButton2, CEGUI::MouseButton::X2Button);
+
+			// Keys:
 			m_mapSFKeyToCEGUIKey.emplace(sf::Keyboard::Unknown, CEGUI::Key::Unknown);
 
 			m_mapSFKeyToCEGUIKey.emplace(sf::Keyboard::A, CEGUI::Key::A);
@@ -118,14 +126,22 @@ namespace Karmazyn
 			m_mapSFKeyToCEGUIKey.emplace(sf::Keyboard::F15, CEGUI::Key::F15);
 			m_mapSFKeyToCEGUIKey.emplace(sf::Keyboard::Pause, CEGUI::Key::Pause);
 		}
-		const CEGUI::Key::Scan& translate(const sf::Keyboard::Key& key)
+
+		const CEGUI::Key::Scan& translateKey(const sf::Keyboard::Key& key)
 		{
 			const auto it = m_mapSFKeyToCEGUIKey.find(key);
 			return it->second; // we get key events from SFML, so the "UNKNOWN" key should never get called here
 		}
 
-		private:
-		std::unordered_map<sf::Keyboard::Key, CEGUI::Key::Scan> m_mapSFKeyToCEGUIKey;
+		const CEGUI::MouseButton& translateMouse(const sf::Mouse::Button& button)
+		{
+			const auto it = m_mapSFMouseButtonToCEGUIMouseButton.find(button);
+			return it->second; // we get key events from SFML, so the "UNKNOWN" key should never get called here
+		}
+
+	private:
+		std::unordered_map<sf::Keyboard::Key, CEGUI::Key::Scan>   m_mapSFKeyToCEGUIKey;
+		std::unordered_map<sf::Mouse::Button, CEGUI::MouseButton> m_mapSFMouseButtonToCEGUIMouseButton;
 	};
 
 	class GameEngine;
@@ -171,8 +187,7 @@ namespace Karmazyn
 
 		GameEngine& theEngine;
 
-		// Given an 'sf::Mouse::Button', returns the corresponding CEGUI::MouseButton upon searching.
-		std::unordered_map<sf::Mouse::Button, CEGUI::MouseButton> m_MouseInputTranslator;
-		KeyboardInputTranslator m_KeyboardInputTranslator;
+		// Responsible for translating the SFML input IDs to CEGUI used ones for injection.
+		SFMLtoCEGUIInputTranslator m_InputTranslator;
 	};
 }

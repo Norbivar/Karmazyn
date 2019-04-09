@@ -49,13 +49,6 @@ namespace Karmazyn
 			CEGUI::MouseCursor& cursor = m_System.getDefaultGUIContext().getMouseCursor();
 			cursor.setDefaultImage("WindowsLook/MouseArrow");
 
-			// Now That CEGUI has been set up, we initialize the InputTranslators.
-			m_MouseInputTranslator = {
-				{ sf::Mouse::Button::Left,      CEGUI::MouseButton::LeftButton      },
-				{ sf::Mouse::Button::Right,     CEGUI::MouseButton::RightButton     },
-				{ sf::Mouse::Button::Middle,    CEGUI::MouseButton::MiddleButton    }
-			};
-
 			// First, the default, root window:
 			CEGUI::Window* root = m_WindowManager.createWindow("DefaultWindow", "root");
 			m_System.getDefaultGUIContext().setRootWindow(root);
@@ -90,45 +83,23 @@ namespace Karmazyn
 			}
 			case sf::Event::MouseButtonPressed:
 			{
-				switch (ev.mouseButton.button)
-				{
-				case sf::Mouse::Button::Left:
-					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::LeftButton);
-					break;
-				case sf::Mouse::Button::Right:
-					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::RightButton);
-					break;
-				case sf::Mouse::Button::Middle:
-					m_System.getDefaultGUIContext().injectMouseButtonDown(CEGUI::MouseButton::MiddleButton);
-					break;
-				}
+				m_System.getDefaultGUIContext().injectMouseButtonDown(m_InputTranslator.translateMouse(ev.mouseButton.button));
 				return true;
 			}
 			case sf::Event::MouseButtonReleased:
 			{
-				switch (ev.mouseButton.button)
-				{
-				case sf::Mouse::Button::Left:
-					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::LeftButton);
-					break;
-				case sf::Mouse::Button::Right:
-					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::RightButton);
-					break;
-				case sf::Mouse::Button::Middle:
-					m_System.getDefaultGUIContext().injectMouseButtonUp(CEGUI::MouseButton::MiddleButton);
-					break;
-				}
-				return true; // Game should not be concerned with the mouse movement 
+				m_System.getDefaultGUIContext().injectMouseButtonUp(m_InputTranslator.translateMouse(ev.mouseButton.button));
+				return true; // TODO: this will cause problems as it will swallow mouse events
 			}
 			case sf::Event::KeyPressed:
 			{
-				const auto& key = m_KeyboardInputTranslator.translate(ev.key.code);
+				const auto& key = m_InputTranslator.translateKey(ev.key.code);
 				m_System.getDefaultGUIContext().injectKeyDown(key);
 				return false;
 			}
 			case sf::Event::KeyReleased:
 			{
-				const auto& key = m_KeyboardInputTranslator.translate(ev.key.code);
+				const auto& key = m_InputTranslator.translateKey(ev.key.code);
 				m_System.getDefaultGUIContext().injectKeyUp(key);
 				return false;
 			}
