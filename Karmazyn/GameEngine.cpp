@@ -4,14 +4,14 @@
 #include "GameState/GameState_LoadingMenu.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "UIManager/UIManager.hpp"
-#include "GameStateStack.hpp"
+#include "GameStateMachine.hpp"
 
 namespace Karmazyn
 {
 	GameEngine::GameEngine() :
-		m_Assets       { std::make_unique<AssetManager>() },
-		m_UI           { nullptr },
-		m_GameStates   { std::make_unique<GameStateStack>(*this) },
+		m_Assets          { std::make_unique<AssetManager>() },
+		m_UI              { nullptr },
+		m_GameStateMachine{ std::make_unique<GameStateMachine>(*this) },
 		m_RenderWindow { },
 
 		m_CoreLoopRunning { false }
@@ -19,13 +19,7 @@ namespace Karmazyn
 		m_RenderWindow.create_from_config();
 		m_UI = std::make_unique<UIManager>(*this); // needs to be initialized after RenderWindow setup
 
-		// consider abstracting this out, to reduce GameEngine dependency hell:
-		// Move gamestatestack out to it's own class, create functions for pushing/poping gamestates into it through predefined strings(?)
-		// like "LoadingMenu" -> GameState_LoadingMenu
-		// But this should be compile time checked (for invalid strings) and done
-		m_GameStates->push(
-			std::make_unique<GameState_LoadingMenu>(*this)
-		);
+		m_GameStateMachine->transition<GameState_LoadingMenu>();
 	}
 	GameEngine::~GameEngine()
 	{
@@ -36,7 +30,7 @@ namespace Karmazyn
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
 
-		m_RenderWindow.createRenderThreadWith(RenderThreadReferencePasser(getUIManager(), getGameStateStack()));
+		m_RenderWindow.createRenderThreadWith(RenderThreadReferencePasser(getUIManager(), getGameStateMachine()));
 
 		bool propagnateEvent = false;
 		sf::Event polledEvent;
@@ -58,24 +52,20 @@ namespace Karmazyn
 
 			propagnateEvent = m_RenderWindow.pollEvent(polledEvent);
 
-			auto& top = m_GameStates->top();
+			auto& top = m_GameStateMachine->current();
 			if (propagnateEvent)
 			{
-				if (polledEvent.type == polledEvent.KeyReleased)
+				if (polledEvent.type == polledEvent.Closed)
 				{
-					if (polledEvent.key.code == sf::Keyboard::F10)
-					{
-						theLog->info("f10 pressed!");
-						changeScreenSize(1600, 900);
-					}
+					Stop();
 				}
-				else top->handleEvent(polledEvent);
+				else top.handleEvent(polledEvent);
 			}
 
 			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
 			{
 				m_UI->getSystem().injectTimePulse(SEC_BETWEEN_TICKS);
-				top->update(SEC_BETWEEN_TICKS);
+				top.update(SEC_BETWEEN_TICKS);
 				diff -= SEC_BETWEEN_TICKS;
 			}
 		}

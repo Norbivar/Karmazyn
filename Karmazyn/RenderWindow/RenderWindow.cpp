@@ -2,7 +2,7 @@
 #include <Logger.hpp>
 #include <Config.hpp>
 
-#include "../GameStateStack.hpp"
+#include "../GameStateMachine.hpp"
 #include "../UIManager/UIManager.hpp"
 #include "../GameState/IGameState.hpp"
 
@@ -49,7 +49,7 @@ namespace Karmazyn
 			{
 				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
 				m_RenderWindow.clear(sf::Color::White);
-				passed.GameStateStack.top()->render();
+				passed.GSM.current().render();
 				passed.UI.draw();
 				m_RenderWindow.display();
 			}

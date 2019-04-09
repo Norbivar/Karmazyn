@@ -21,13 +21,13 @@ namespace Karmazyn
 		};
 	}
 
-	class UIManager; class GameStateStack;
-	// Containts references to the UIManager and GameStateStack for the rendering thread. These can safely be stored around, 
-	// as by design, the UI and GameStateStack (and Engine related things) should never move around.
+	class UIManager; class GameStateMachine;
+	// Contains references to the UIManager and GameStateMachine for the rendering thread. These can safely be stored around, 
+	// as by design, the UI and GameStateMachine (and Engine related things) should never move around.
 	struct RenderThreadReferencePasser {
-		RenderThreadReferencePasser(UIManager& ui, GameStateStack& gss) : UI(ui), GameStateStack(gss) {}
+		RenderThreadReferencePasser(UIManager& ui, GameStateMachine& gsm) : UI(ui), GSM(gsm) {}
 		UIManager& UI;
-		GameStateStack& GameStateStack;
+		GameStateMachine& GSM;
 	};
 	// Wrapper for an SFML RenderWindow, aiming to provide the same functionality while encompassing the render logic and potential coupling.
 	class RenderWindow
@@ -42,7 +42,6 @@ namespace Karmazyn
 		void create_from_config();
 		// Creates the m_RenderThread, that will 
 		void createRenderThreadWith(const RenderThreadReferencePasser& passer);
-		void createRenderThread();
 		void resetRenderThread();
 
 		template<typename T> void process(T&& command) { static_assert(false, "RenderWindow.process() called with not specialized type!"); }
@@ -54,9 +53,13 @@ namespace Karmazyn
 			theConfig->set<int>(Configs::VSync, command.newStatus);
 		}
 
+		// Stops the render thread, joins it to current thread and closes the SFML render window.
 		inline void close()     { resetRenderThread(); m_RenderWindow.close(); }
+		// Returns whether the underlying SFML window is considered Open.
 		inline bool isOpen()    { return m_RenderWindow.isOpen(); }
+		// Returns whether the underlying SFML window is considered to have focus.
 		inline bool hasFocus()  { return m_RenderWindow.hasFocus(); }
+		// Perfectly forwards the call to the SFML renderwindows same function.
 		inline bool pollEvent(sf::Event& ev) { return m_RenderWindow.pollEvent(ev); }
 	private:
 		std::unique_ptr<RenderThreadReferencePasser> m_ReferencePasser;

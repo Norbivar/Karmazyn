@@ -3,7 +3,7 @@
 #include "../Globals.hpp"
 #include "../GameEngine.hpp"
 #include "../UIManager/UIManager.hpp"
-#include "../GameStateStack.hpp"
+#include "../GameStateMachine.hpp"
 #include "GameState_MainMenu.hpp"
 
 
@@ -49,9 +49,7 @@ namespace Karmazyn
 	void GameState_LoadingMenu::onLoadingDone(const CEGUI::EventArgs& /*e*/)
 	{
 		m_LoadingLabel->setProperty("Text", "DONE!");
-		std::unique_ptr<IGameState> swapper = std::make_unique<GameState_MainMenu>(theEngine);
-		//theUI.getWindowManager().destroyWindow(m_LoadingGUIRoot);
-		theEngine.getGameStateStack().swapTop(swapper);
+		theEngine.getGameStateMachine().transition<GameState_MainMenu>();
 	}
 
 #pragma region IGameState_Implementation
