@@ -1,20 +1,22 @@
 #pragma once
 #include <CEGUI/CEGUI.h>
-#include "IGameState.hpp"
+#include "../IGameState.hpp"
 
 namespace Karmazyn
 {
-	class GameEngine; class UIManager;
+	class Engine; class UIManager;
 	class GameState_LoadingMenu : public IGameState
 	{
 	public:
-		GameState_LoadingMenu(GameEngine& engine);
+		GameState_LoadingMenu(Engine& engine);
 		~GameState_LoadingMenu() override;
 
 		#pragma region IGameState_Implementation
 		void update(float diff) override;
 		void render() const override;
 		void handleEvent(const sf::Event& event) override;
+		void afterTransitionedIn() override;
+		void beforeTransitionedOut() override;
 		#pragma endregion
 
 		std::string determineTippText();

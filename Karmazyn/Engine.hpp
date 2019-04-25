@@ -11,11 +11,11 @@ namespace Karmazyn
 {
 	class AssetManager; class UIManager; class GameStateMachine;
 
-	class GameEngine
+	class Engine
 	{
 	public:
-		GameEngine();
-		~GameEngine(); // otherwise the default destructor will cry not knowing how to delete pointers of uncomplete types
+		Engine();
+		~Engine(); // otherwise the default destructor will cry not knowing how to delete pointers of uncomplete types
 
 
 		// Initializes the RenderWindow with references to the UI manager and GameStateMachine.
@@ -29,14 +29,16 @@ namespace Karmazyn
 		UIManager&        getUIManager()        { return *m_UI; }
 		GameStateMachine& getGameStateMachine() { return *m_GameStateMachine; }
 
+		// These functions pretty much delegate calls to the RenderWindow (Graphics) and CEGUI if necessary.
 		void changeScreenSize(const unsigned int newWidth, const unsigned int newHeight);
 		void changeVerticalSynced(bool enabled);
+		void changeWindowedMode(bool enabled);
 
 	private:
-		GameEngine(const GameEngine&) = delete;
-		GameEngine(GameEngine&&) = delete;
-		const GameEngine& operator=(const GameEngine&) = delete;
-		const GameEngine& operator=(GameEngine&&) = delete;
+		Engine(const Engine&) = delete;
+		Engine(Engine&&) = delete;
+		const Engine& operator=(const Engine&) = delete;
+		const Engine& operator=(Engine&&) = delete;
 
 		std::unique_ptr<AssetManager> m_Assets;
 		std::unique_ptr<UIManager>    m_UI;

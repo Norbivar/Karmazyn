@@ -1,21 +1,24 @@
 #pragma once
-#include "IGameState.hpp"
+#include "../IGameState.hpp"
 #include <CEGUI/CEGUI.h>
 
 namespace Karmazyn
 {
-	class GameEngine; class UIManager;
+	class Engine; class UIManager;
 
 	class GameState_MainMenu : public IGameState
 	{
 	public:
-		GameState_MainMenu(GameEngine& engine);
+		GameState_MainMenu(Engine& engine);
 		~GameState_MainMenu() override;
 
 #pragma region IGameState_Implementation
 		void update(float diff) override;
 		void render() const override;
 		void handleEvent(const sf::Event& event) override;
+
+		void afterTransitionedIn() override;
+		void beforeTransitionedOut() override;
 #pragma endregion
 
 	private:
@@ -33,6 +36,7 @@ namespace Karmazyn
 				CEGUI::NamedElement*    m_VersionLabel;
 			CEGUI::Window*      m_OptionsWindow;
 				CEGUI::ToggleButton*    m_OptionVSyncCheckbox; // nested in VsyncLabel
+				CEGUI::ToggleButton*    m_OptionWindowedModeCheckbox; // nested in WindowedModeLabel
 				CEGUI::Editbox*         m_OptionResolutionWidth;
 				CEGUI::Editbox*         m_OptionResolutionHeight;
 				CEGUI::Window*          m_RestartNotificationLabel;

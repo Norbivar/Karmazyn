@@ -74,6 +74,11 @@ namespace Karmazyn
 		{
 			m_SettingsRootMap[configname] = boost::lexical_cast<std::string>(setto);
 		}
+		template<>
+		void set<bool>(const char* configname, const bool& setto)
+		{
+			set<int>(configname, setto);
+		}
 
 		void saveAllConfigTo(const char* filename);
 		void saveAll();

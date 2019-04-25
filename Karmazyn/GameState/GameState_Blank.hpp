@@ -7,7 +7,7 @@ namespace Karmazyn
 	class GameState_Blank : public IGameState
 	{
 	public:
-		GameState_Blank(GameEngine& engine) : IGameState(engine) {}
+		GameState_Blank(Engine& engine) : IGameState(engine) {}
 		~GameState_Blank() override { }
 
 		void update(float diff) override { }

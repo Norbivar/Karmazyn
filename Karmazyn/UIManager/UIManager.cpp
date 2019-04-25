@@ -2,12 +2,12 @@
 
 #include <Logger.hpp>
 
-#include "GameEngine.hpp"
+#include "Engine.hpp"
 #include "../Globals.hpp"
 
 namespace Karmazyn
 {
-	UIManager::UIManager(GameEngine& engine) :
+	UIManager::UIManager(Engine& engine) :
 		theEngine       {engine},
 		//pMyWindow(window),
 		m_Renderer      {CEGUI::OpenGL3Renderer::bootstrapSystem()},
@@ -53,6 +53,8 @@ namespace Karmazyn
 			CEGUI::Window* root = m_WindowManager.createWindow("DefaultWindow", "root");
 			m_System.getDefaultGUIContext().setRootWindow(root);
 
+			root->setMousePassThroughEnabled(true); // this will make the invisible root ignore mouse events so that they can be processed by the Game itself
+
 			for (std::string layoutname : Settings::GUI::LayoutsToLoad)
 			{
 				auto* layout = m_WindowManager.loadLayoutFromFile(layoutname, "layouts");
@@ -81,27 +83,30 @@ namespace Karmazyn
 				);
 				return false; // infact, the game might (and probably will) have an outline for units/things under cursor, so indeed this should not block
 			}
+
 			case sf::Event::MouseButtonPressed:
 			{
-				m_System.getDefaultGUIContext().injectMouseButtonDown(m_InputTranslator.translateMouse(ev.mouseButton.button));
-				return true;
+				const auto& mouse = m_InputTranslator.translateMouse(ev.mouseButton.button);
+				return m_System.getDefaultGUIContext().injectMouseButtonDown(mouse); // this will only swallow the event if it was handled by the UI - I guess
 			}
 			case sf::Event::MouseButtonReleased:
 			{
-				m_System.getDefaultGUIContext().injectMouseButtonUp(m_InputTranslator.translateMouse(ev.mouseButton.button));
-				return true; // TODO: this will cause problems as it will swallow mouse events
+				const auto& mouse = m_InputTranslator.translateMouse(ev.mouseButton.button);
+				return m_System.getDefaultGUIContext().injectMouseButtonUp(mouse);
 			}
 			case sf::Event::KeyPressed:
 			{
 				const auto& key = m_InputTranslator.translateKey(ev.key.code);
-				m_System.getDefaultGUIContext().injectKeyDown(key);
-				return false;
+				return m_System.getDefaultGUIContext().injectKeyDown(key);
+			}
+			case sf::Event::TextEntered:
+			{
+				return m_System.getDefaultGUIContext().injectChar(ev.text.unicode);
 			}
 			case sf::Event::KeyReleased:
 			{
 				const auto& key = m_InputTranslator.translateKey(ev.key.code);
-				m_System.getDefaultGUIContext().injectKeyUp(key);
-				return false;
+				return m_System.getDefaultGUIContext().injectKeyUp(key);
 			}
 			case sf::Event::Resized:
 			{
@@ -112,7 +117,6 @@ namespace Karmazyn
 				);
 				return false;
 			}
-			return false;
 		}
 		return false; // every unhandled event will be passed to the GameEngine
 	}

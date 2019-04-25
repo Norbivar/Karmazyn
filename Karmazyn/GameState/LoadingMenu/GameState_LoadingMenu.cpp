@@ -1,15 +1,15 @@
 #include "GameState_LoadingMenu.hpp"
 #include <Logger.hpp>
-#include "../Globals.hpp"
-#include "../GameEngine.hpp"
-#include "../UIManager/UIManager.hpp"
-#include "../GameStateMachine.hpp"
-#include "GameState_MainMenu.hpp"
+#include "../../Globals.hpp"
+#include "../../Engine.hpp"
+#include "../../UIManager/UIManager.hpp"
+#include "../../GameStateMachine.hpp"
 
+#include "../MainMenu/GameState_MainMenu.hpp"
 
 namespace Karmazyn
 {
-	GameState_LoadingMenu::GameState_LoadingMenu(GameEngine& engine) :
+	GameState_LoadingMenu::GameState_LoadingMenu(Engine& engine) :
 		IGameState(engine),
 		theUI(engine.getUIManager())
 	{
@@ -27,8 +27,6 @@ namespace Karmazyn
 
 		m_TippLabel = m_LoadingGUIRoot->getChildElement("TippLabel");
 		m_TippLabel->setProperty("Text", determineTippText());
-
-		m_LoadingGUIRoot->show();
 	}
 	GameState_LoadingMenu::~GameState_LoadingMenu()
 	{
@@ -40,7 +38,7 @@ namespace Karmazyn
 			"TODO: these tipps will need to be updated, once there is something to do, as they are pretty much just placeholders, showing the overall picture of the loading screen.",
 			"Lorem ipsum doloret sit amet, menjünk dógozni."
 		};
-		return *Utility::getRandomElement(LoadingScreenTipps);
+		return *Utility::Container::getRandomElement(LoadingScreenTipps);
 	}
 	std::string GameState_LoadingMenu::determineLoadingText()
 	{
@@ -59,9 +57,18 @@ namespace Karmazyn
 		if (theUI.handleEvent(event)) // GUI event will always come first
 			return;
 	}
+	void GameState_LoadingMenu::afterTransitionedIn()
+	{
+		m_LoadingGUIRoot->show();
+	}
+	void GameState_LoadingMenu::beforeTransitionedOut()
+	{
+		m_LoadingGUIRoot->deactivate();
+		m_LoadingGUIRoot->hide();
+	}
 	void GameState_LoadingMenu::render() const // called by a different thread, but .draw() takes const ref, so it should be fine
 	{
-// 		theUI.draw();
+ 		theUI.draw();
 	}
 	void GameState_LoadingMenu::update(float diff)
 	{

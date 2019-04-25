@@ -7,7 +7,7 @@
 namespace Karmazyn
 {
 	// Helper class, providing a safer top() behaviour, that is guaranteed to return a valid reference.
-	class IGameState; class GameEngine;
+	class IGameState; class Engine;
 
 	class InvalidStateMachineTransitionException : public std::exception
 	{
@@ -24,7 +24,7 @@ namespace Karmazyn
 	class GameStateMachine
 	{
 	public:
-		GameStateMachine(GameEngine& engine);
+		GameStateMachine(Engine& engine);
 		~GameStateMachine();
 
 		// Instantiates a new state of the type TargetState with forwarded construction arguments. 
@@ -32,10 +32,17 @@ namespace Karmazyn
 		template<typename TargetState, typename... ConstructorArgs>
 		void transition(ConstructorArgs&&... args)
 		{
+			static_assert(std::is_base_of_v<IGameState, TargetState>, "GameStateMachine::transition were called with a class that does not inherit from IGameState.");
+
+			if(m_CurrentState)
+				m_CurrentState->beforeTransitionedOut();
+
 			std::unique_ptr<IGameState> holder = std::make_unique<TargetState>(theEngine, std::forward<ConstructorArgs>(args)...);
 			m_CurrentState.swap(holder);
 			if(holder)
 				m_HitStates.emplace(std::move(holder));
+
+			m_CurrentState->afterTransitionedIn();
 		}
 
 		// Creates a new TargetState and jumps to it (assigns it to CurrentState). This will never save the old state. I did it this way because I don't know whether variadic arguments
@@ -55,7 +62,7 @@ namespace Karmazyn
 
 		IGameState& current() { return *m_CurrentState; }
 	private:
-		GameEngine& theEngine;
+		Engine& theEngine;
 
 		std::unique_ptr<IGameState> m_CurrentState;
 		std::stack<std::unique_ptr<IGameState>> m_HitStates;

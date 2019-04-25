@@ -1,6 +1,6 @@
-#include "GameEngine.hpp"
+#include "Engine.hpp"
 #include "IGameState.hpp"
 
-Karmazyn::IGameState::IGameState(GameEngine & engine) :
+Karmazyn::IGameState::IGameState(Engine & engine) :
 	theEngine(engine)
 { }

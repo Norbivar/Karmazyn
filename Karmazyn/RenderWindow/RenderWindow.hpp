@@ -19,6 +19,11 @@ namespace Karmazyn
 			ToggleVSync(bool status) : newStatus(status) { }
 			bool newStatus;
 		};
+		struct ToggleWindowed
+		{
+			ToggleWindowed(bool enabled) : windowedModeEnabled(enabled) { }
+			bool windowedModeEnabled;
+		};
 	}
 
 	class UIManager; class GameStateMachine;
@@ -44,13 +49,32 @@ namespace Karmazyn
 		void createRenderThreadWith(const RenderThreadReferencePasser& passer);
 		void resetRenderThread();
 
-		template<typename T> void process(T&& command) { static_assert(false, "RenderWindow.process() called with not specialized type!"); }
+		template<typename T> void process(T&& command) { static_assert(false, "RenderWindow.process(T&& command) called with not specialized type!"); }
 		template<> void process(RenderWindowCommands::Resize&& command) {
+			if (command.newWidth < 800)
+				command.newWidth = 800;
+			if (command.newHeight < 600)
+				command.newHeight = 600;
+
 			theConfig->set<int>(Configs::ResolutionX, command.newWidth);
 			theConfig->set<int>(Configs::ResolutionY, command.newHeight);
 		}
 		template<> void process(RenderWindowCommands::ToggleVSync&& command) {
 			theConfig->set<int>(Configs::VSync, command.newStatus);
+		}
+		template<> void process(RenderWindowCommands::ToggleWindowed&& command) {
+			const auto currentConfig = theConfig->get<int>(Configs::RenderWindowStyle); // Style is int-flag 
+			int configToSet = currentConfig;
+
+			// enable windowed mode
+			if (command.windowedModeEnabled)
+				configToSet &= ~sf::Style::Fullscreen;
+
+			// disable windoed mode (AKA enable fullscreen)
+			else
+				configToSet |= sf::Style::Fullscreen;
+
+			theConfig->set<int>(Configs::RenderWindowStyle, configToSet);
 		}
 
 		// Stops the render thread, joins it to current thread and closes the SFML render window.

@@ -1,8 +1,8 @@
 ﻿#include "Karmazyn.h"
-#include "GameEngine.hpp"
+#include "Engine.hpp"
 
 int main()
 {
-	Karmazyn::GameEngine core;
+	Karmazyn::Engine core;
 	return core.Run();
 }

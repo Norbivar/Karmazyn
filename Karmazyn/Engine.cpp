@@ -1,14 +1,14 @@
-#include "GameEngine.hpp"
+#include "Engine.hpp"
 #include <ConfigList.hpp>
 
-#include "GameState/GameState_LoadingMenu.hpp"
+#include "GameState/LoadingMenu/GameState_LoadingMenu.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "UIManager/UIManager.hpp"
 #include "GameStateMachine.hpp"
 
 namespace Karmazyn
 {
-	GameEngine::GameEngine() :
+	Engine::Engine() :
 		m_Assets          { std::make_unique<AssetManager>() },
 		m_UI              { nullptr },
 		m_GameStateMachine{ std::make_unique<GameStateMachine>(*this) },
@@ -21,11 +21,11 @@ namespace Karmazyn
 
 		m_GameStateMachine->transition<GameState_LoadingMenu>();
 	}
-	GameEngine::~GameEngine()
+	Engine::~Engine()
 	{
 
 	}
-	int GameEngine::Run()
+	int Engine::Run()
 	{		
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
@@ -73,12 +73,12 @@ namespace Karmazyn
 		theLog->info("GameEngine stopping!");
 		return 0;
 	}
-	void GameEngine::Stop()
+	void Engine::Stop()
 	{
 		m_RenderWindow.close(); // this will close the render window, which will in turn end the main loop and thus the program
 		m_CoreLoopRunning.store(false, std::memory_order::memory_order_relaxed);
 	}
-	void GameEngine::changeScreenSize(const unsigned int newWidth, const unsigned int newHeight)
+	void Engine::changeScreenSize(const unsigned int newWidth, const unsigned int newHeight)
 	{
 		float newWidthFloat = 0.0f, newHeightFloat = 0.0f;
 		newWidthFloat += newWidth;
@@ -88,8 +88,12 @@ namespace Karmazyn
  		//m_UI->getSystem().notifyDisplaySizeChanged(CEGUI::Sizef{ newWidthFloat, newHeightFloat });
 		theLog->info("Screen resolution changed to {}x{} for next restart.", newWidth, newHeight);
 	}
-	void GameEngine::changeVerticalSynced(bool enabled)
+	void Engine::changeVerticalSynced(bool enabled)
 	{
 		m_RenderWindow.process(RenderWindowCommands::ToggleVSync(enabled));
+	}
+	void Engine::changeWindowedMode(bool enabled)
+	{
+		m_RenderWindow.process(RenderWindowCommands::ToggleWindowed(enabled));
 	}
 }

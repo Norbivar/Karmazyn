@@ -5,11 +5,11 @@
 
 namespace Karmazyn
 {
-	class GameEngine;
+	class Engine;
 	class IGameState
 	{
 	public:
-		IGameState(GameEngine& engine);
+		IGameState(Engine& engine);
 		virtual ~IGameState() { }
 
 		// Called periodically.
@@ -21,7 +21,14 @@ namespace Karmazyn
 		// Called whenever there is an event to process.
 		virtual void handleEvent(const sf::Event& event) = 0;
 
+		// Called before the GameState would become active through either transition or backtrace (popping the game state stack).
+		// Widely used for showing GameState specific GUI elements.
+		virtual void afterTransitionedIn() {};
+
+		// Called before we transition from this state to another.
+		// Widely used for hiding/disabling GameState specific GUI elements.
+		virtual void beforeTransitionedOut() {};
 	protected:
-		GameEngine& theEngine;
+		Engine& theEngine;
 	};
 }

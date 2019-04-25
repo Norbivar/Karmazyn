@@ -22,17 +22,19 @@ namespace Karmazyn
 		m_RenderWindow.create(
 			sf::VideoMode(width, height), "Karmazyn", m_WindowStyle, m_ContextSettings
 		);
+		theLog->info("Using OpenGL: {}.{}",
+			m_RenderWindow.getSettings().majorVersion,
+			m_RenderWindow.getSettings().minorVersion
+		);
+		m_RenderWindow.setVerticalSyncEnabled(theConfig->get<bool>(Configs::VSync, true));
 		m_RenderWindow.setMouseCursorVisible(false);
+		m_RenderWindow.requestFocus();
 	}
 	void RenderWindow::create_from_config()
 	{
 		create(
 			theConfig->get<int>(Configs::ResolutionX, 1024), 
 			theConfig->get<int>(Configs::ResolutionY, 768)
-		);
-		theLog->info("Using OpenGL: {}.{}",
-			m_RenderWindow.getSettings().majorVersion,
-			m_RenderWindow.getSettings().minorVersion
 		);
 	}
 
@@ -50,7 +52,7 @@ namespace Karmazyn
 				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
 				m_RenderWindow.clear(sf::Color::White);
 				passed.GSM.current().render();
-				passed.UI.draw();
+				//passed.UI.draw();
 				m_RenderWindow.display();
 			}
 			m_RenderWindow.setActive(false);
