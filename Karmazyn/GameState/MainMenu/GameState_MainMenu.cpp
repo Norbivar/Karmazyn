@@ -97,7 +97,7 @@ namespace Karmazyn
 		#pragma endregion
 
 		m_VersionLabel = m_MainMenuRoot->getChildElement("MenuVersionLabel");
-		m_VersionLabel->setProperty("Text", BuildVersion);
+		m_VersionLabel->setProperty("Text", Constants::BuildVersion);
 	}
 
 	GameState_MainMenu::~GameState_MainMenu()
@@ -125,7 +125,7 @@ namespace Karmazyn
 	{
 		theEngine.Stop();
 	}
-
+#pragma region IGameState_Implementation
 	void GameState_MainMenu::update(float diff)
 	{
 
@@ -140,9 +140,6 @@ namespace Karmazyn
 	{
 		if (theUI.handleEvent(event)) // GUI event will always come first
 			return;
-
-		if (event.type == sf::Event::MouseButtonPressed)
-			theLog->info("CLICK OUTSIDE");
 	}
 	void GameState_MainMenu::afterTransitionedIn()
 	{
@@ -156,4 +153,5 @@ namespace Karmazyn
 		m_MainMenuRoot->deactivate();
 		m_MainMenuRoot->hide();
 	}
+#pragma endregion
 }

@@ -25,6 +25,7 @@ namespace Karmazyn
 	}
 	void GameState_Game::render() const
 	{
+
 		theUI.draw();
 	}
 	void GameState_Game::update(float diff)

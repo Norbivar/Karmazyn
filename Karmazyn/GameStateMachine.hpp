@@ -27,7 +27,7 @@ namespace Karmazyn
 		GameStateMachine(Engine& engine);
 		~GameStateMachine();
 
-		// Instantiates a new state of the type TargetState with forwarded construction arguments. 
+		// Instantiates a new state of the type TargetState. The TargetState will be constructed with forwarded arguments ('args').
 		// Then it swaps the CurrentState with the new state and pushes the old state to the top of the History stack.
 		template<typename TargetState, typename... ConstructorArgs>
 		void transition(ConstructorArgs&&... args)
@@ -57,9 +57,11 @@ namespace Karmazyn
 		// Pops the top of the stack and restores it to being the CurrentState. 
 		// This will also discard the old CurrentState.
 		void transitionBack();
+
 		// Clears the History stack.
 		void clearHistory();
 
+		// Returns the GameState that is currently in "focus".
 		IGameState& current() { return *m_CurrentState; }
 	private:
 		Engine& theEngine;

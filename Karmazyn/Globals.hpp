@@ -6,8 +6,6 @@
 
 namespace Karmazyn
 {
-	constexpr const char* const BuildVersion = "v0.02";
-
 	namespace Utility
 	{
 		namespace Container
@@ -64,7 +62,7 @@ namespace Karmazyn
 	}
 	namespace Constants
 	{
-
+		constexpr const char* const BuildVersion = "v0.02";
 	}
 	namespace Settings
 	{
@@ -76,6 +74,11 @@ namespace Karmazyn
 			{
 				"LoadingGUI.layout",
 				"MainMenuGUI.layout",
+			};
+			constexpr std::array<const char*, 2> LoadingScreenTipps = 
+			{
+				"TODO: these tipps will need to be updated, once there is something to do, as they are pretty much just placeholders, showing the overall picture of the loading screen.",
+				"Lorem ipsum doloret sit amet, menjünk dógozni."
 			};
 			constexpr const char* const SchemeName = "karmazyn.scheme";
 		}

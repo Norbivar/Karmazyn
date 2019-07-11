@@ -9,7 +9,7 @@ namespace Karmazyn
 	class IGameState
 	{
 	public:
-		IGameState(Engine& engine);
+		explicit IGameState(Engine& engine);
 		virtual ~IGameState() { }
 
 		// Called periodically.

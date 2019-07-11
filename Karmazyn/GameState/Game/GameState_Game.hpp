@@ -1,19 +1,25 @@
 #pragma once
 #include "../IGameState.hpp"
 #include <vector>
+#include <memory>
 #include <CEGUI/CEGUI.h>
+#include <SFML/Graphics/Drawable.hpp>
 
 namespace Karmazyn
 {
-	class Engine; class UIManager;
+	class Engine; class UIManager; 
 
-	struct GameInitParams
-	{
-		std::string
-	};
 
 	class GameState_Game : public IGameState
 	{
+		struct GameInitParams
+		{
+			GameInitParams(int i)
+			{
+
+			}
+		};
+
 	public:
 		GameState_Game(Engine& engine, const GameInitParams& params);
 		~GameState_Game() override;
@@ -28,8 +34,5 @@ namespace Karmazyn
 		// A shortcut for 'theEngine.getUIManager()'.
 		UIManager& theUI;
 
-
-		using IngameMap = std::vector<std::vector<int>>;
-		IngameMap m_Map;
 	};
 }

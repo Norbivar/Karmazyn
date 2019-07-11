@@ -34,11 +34,7 @@ namespace Karmazyn
 	}
 	std::string GameState_LoadingMenu::determineTippText()
 	{
-		std::array<const char*, 2> LoadingScreenTipps = {
-			"TODO: these tipps will need to be updated, once there is something to do, as they are pretty much just placeholders, showing the overall picture of the loading screen.",
-			"Lorem ipsum doloret sit amet, menjünk dógozni."
-		};
-		return *Utility::Container::getRandomElement(LoadingScreenTipps);
+		return *Utility::Container::getRandomElement(Settings::GUI::LoadingScreenTipps);
 	}
 	std::string GameState_LoadingMenu::determineLoadingText()
 	{

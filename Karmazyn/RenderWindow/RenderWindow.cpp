@@ -52,7 +52,6 @@ namespace Karmazyn
 				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
 				m_RenderWindow.clear(sf::Color::White);
 				passed.GSM.current().render();
-				//passed.UI.draw();
 				m_RenderWindow.display();
 			}
 			m_RenderWindow.setActive(false);

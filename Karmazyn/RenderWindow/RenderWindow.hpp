@@ -7,6 +7,7 @@
 
 namespace Karmazyn
 {
+	// Contains "data-storage" (essentially arguments) structs for the RenderWindow process(...) method.
 	namespace RenderWindowCommands
 	{
 		struct Resize
@@ -85,6 +86,8 @@ namespace Karmazyn
 		inline bool hasFocus()  { return m_RenderWindow.hasFocus(); }
 		// Perfectly forwards the call to the SFML renderwindows same function.
 		inline bool pollEvent(sf::Event& ev) { return m_RenderWindow.pollEvent(ev); }
+		// Perfectly forwards the call to the SFML renderwindows same function.
+		inline void draw(const sf::Drawable& draw, const sf::RenderStates& states = sf::RenderStates::Default) { m_RenderWindow.draw(draw, states); }
 	private:
 		std::unique_ptr<RenderThreadReferencePasser> m_ReferencePasser;
 

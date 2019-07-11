@@ -9,10 +9,10 @@
 namespace Karmazyn
 {
 	Engine::Engine() :
-		m_Assets          { std::make_unique<AssetManager>() },
-		m_UI              { nullptr },
-		m_GameStateMachine{ std::make_unique<GameStateMachine>(*this) },
-		m_RenderWindow { },
+		m_Assets           { std::make_unique<AssetManager>() },
+		m_UI               { nullptr },
+		m_GameStateMachine { std::make_unique<GameStateMachine>(*this) },
+		m_RenderWindow     { },
 
 		m_CoreLoopRunning { false }
 	{
@@ -52,20 +52,20 @@ namespace Karmazyn
 
 			propagnateEvent = m_RenderWindow.pollEvent(polledEvent);
 
-			auto& top = m_GameStateMachine->current();
+			auto& currentGameState = m_GameStateMachine->current();
 			if (propagnateEvent)
 			{
 				if (polledEvent.type == polledEvent.Closed)
 				{
 					Stop();
 				}
-				else top.handleEvent(polledEvent);
+				else currentGameState.handleEvent(polledEvent);
 			}
 
 			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
 			{
 				m_UI->getSystem().injectTimePulse(SEC_BETWEEN_TICKS);
-				top.update(SEC_BETWEEN_TICKS);
+				currentGameState.update(SEC_BETWEEN_TICKS);
 				diff -= SEC_BETWEEN_TICKS;
 			}
 		}
