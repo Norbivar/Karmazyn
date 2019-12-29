@@ -1,3 +1,6 @@
+# Output dirs
+./out
+
 # Prerequisites
 *.d
 
