@@ -1,7 +1,5 @@
 #include "UIManager.hpp"
 
-#include <Logger.hpp>
-
 #include "Engine.hpp"
 #include "../Globals.hpp"
 
@@ -78,8 +76,8 @@ namespace Karmazyn
 			case sf::Event::MouseMoved:
 			{
 				m_System.getDefaultGUIContext().injectMousePosition(
-					ev.mouseMove.x,
-					ev.mouseMove.y
+					static_cast<float>(ev.mouseMove.x),
+					static_cast<float>(ev.mouseMove.y)
 				);
 				return false; // infact, the game might (and probably will) have an outline for units/things under cursor, so indeed this should not block
 			}
@@ -123,8 +121,8 @@ namespace Karmazyn
 	void UIManager::handleNativeMouseMove(const sf::Vector2i& ev)
 	{
 		m_System.getDefaultGUIContext().injectMousePosition(
-			ev.x,
-			ev.y
+			static_cast<float>(ev.x),
+			static_cast<float>(ev.y)
 		);
 	}
 }

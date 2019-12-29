@@ -5,23 +5,22 @@
 #include <map>
 #include <exception>
 
-#include "Logger.hpp"
 #include "LibSettings.hpp"
 #include "ConfigList.hpp"
 
-#define theConfig Karmazyn::Config::GetConfig()
-namespace Karmazyn
+namespace MyPI
 {
-	struct ConfigNotFoundException : public std::exception
+	struct ConfigOrFileNotFoundException : public std::exception
 	{
-		ConfigNotFoundException(const std::string& msg) : msg(msg) { }
+		ConfigOrFileNotFoundException(const std::string& msg) : msg(msg) { }
 		const char* what() const throw ()
 		{
 			return msg.c_str();
 		}
 		
-		std::string msg;
+		const std::string msg;
 	};
+
 	class Config
 	{
 	public:
@@ -32,10 +31,7 @@ namespace Karmazyn
 		{
 			for (const auto& name : file_name_list)
 			{
-				if (readFile(name))
-					theLog->info("Config: {} succesfully read!", name);
-				else
-					theLog->warn("Config: Failed to read {}!", name);
+				readFile(name);
 			}
 		}
 
@@ -43,41 +39,43 @@ namespace Karmazyn
 
 		// Returns the first match of "configname" or the default value if not found any.
 		// Wrong types will cause a boost::bad_cast exception (boost::any-based).
-		template<typename T>
-		T get(const char* configname, T defaultval)
+		template<typename config, typename T = config::type>
+		T get(const T& defaultval)
 		{
+			const auto& configname = config::getValue();
 			const auto& node = m_SettingsRootMap.find(configname);
 			if (node != m_SettingsRootMap.end())
 			{
 				return boost::lexical_cast<T>(node->second);
 			}
-			if (ConfigSettings::cLogUnsuccessfulConfigGets)
-				theLog->warn("Config: Lookup for: '{}' was UNSUCCESSFUL, returning default!", configname);
 
-			set<T>(configname, defaultval); // this will make sure that not found configs at first run will get printed out to .ini. TODO: think this through
+			set<config>(defaultval); // this will make sure that not found configs at first run will get printed out to .ini. TODO: think this through
 			return defaultval;
 		}
 
-		template<typename T>
-		T get(const char* configname)
+		template<typename config, typename T = config::type>
+		T get()
 		{
+			const auto& configname = config::getValue();
 			const auto& node = m_SettingsRootMap.find(configname);
 			if (node != m_SettingsRootMap.end())
 			{
 				return boost::lexical_cast<T>(node->second);
 			}
-			throw ConfigNotFoundException(std::string("CONFIG: Could not find:" + std::string(configname)));
+			throw ConfigOrFileNotFoundException(std::string("CONFIG: Could not find:" + std::string(configname)));
 		}
 
-		template<typename T>
-		void set(const char* configname, const T& setto)
+		template<typename config>
+		std::string getAsString()
 		{
-			m_SettingsRootMap[configname] = boost::lexical_cast<std::string>(setto);
+			return get<config, std::string>();
 		}
-		template<>
-		void set<bool>(const char* configname, const bool& setto)
+
+		template<typename config, typename T = config::type>
+		void set(const T& setto)
 		{
-			set<int>(configname, setto);
+			const auto& configname = config::getValue();
+			m_SettingsRootMap[configname] = boost::lexical_cast<std::string>(setto);
 		}
 
 		void saveAllConfigTo(const char* filename);

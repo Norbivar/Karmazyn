@@ -1,50 +1,26 @@
 #pragma once
 #include "../IGameState.hpp"
-#include <CEGUI/CEGUI.h>
 
 namespace Karmazyn
 {
-	class Engine; class UIManager;
+	class UIState_MainMenu;
 
-	class GameState_MainMenu : public IGameState
+	class GameState_MainMenu : 
+		public IGameState
 	{
 	public:
 		GameState_MainMenu(Engine& engine);
 		~GameState_MainMenu() override;
 
-#pragma region IGameState_Implementation
+		#pragma region IGameState_Implementation
 		void update(float diff) override;
 		void render() const override;
 		void handleEvent(const sf::Event& event) override;
 
 		void afterTransitionedIn() override;
 		void beforeTransitionedOut() override;
-#pragma endregion
-
+		#pragma endregion
 	private:
-		// A shortcut for 'theEngine.getUIManager()'.
-		UIManager& theUI;
-
-		// Root of the loaded Layout (which is a StaticImage -> the background picture)
-		// The tabulation of rows show parent-child relationships
-		CEGUI::Window* m_MainMenuRoot;
-			CEGUI::NamedElement*      m_MainMenuWindow;
-				CEGUI::PushButton*      m_NewGameButton;
-				CEGUI::PushButton*      m_LoadGameButton;
-				CEGUI::PushButton*      m_OptionsButton;
-				CEGUI::PushButton*      m_QuitGameButton;
-				CEGUI::NamedElement*    m_VersionLabel;
-			CEGUI::Window*      m_OptionsWindow;
-				CEGUI::ToggleButton*    m_OptionVSyncCheckbox; // nested in VsyncLabel
-				CEGUI::ToggleButton*    m_OptionWindowedModeCheckbox; // nested in WindowedModeLabel
-				CEGUI::Editbox*         m_OptionResolutionWidth;
-				CEGUI::Editbox*         m_OptionResolutionHeight;
-				CEGUI::Window*          m_RestartNotificationLabel;
-			//TODO: finish options window
-
-		void onNewGameClicked (const CEGUI::EventArgs& /*e*/);
-		void onLoadGameClicked(const CEGUI::EventArgs& /*e*/);
-		void onOptionsClicked (const CEGUI::EventArgs& /*e*/);
-		void onQuitGameClicked(const CEGUI::EventArgs& /*e*/);
+		std::unique_ptr<UIState_MainMenu> theUIState;
 	};
 }

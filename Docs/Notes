@@ -1,0 +1,13 @@
+Notes:
+- _impl.cpp : template function definitions
+
+Map:
+	Definitely a 1D vector (simulated 2D) of some sorts, to instantly access individual tiles.	
+	This could need an API to use (built up with a member vector), with both a [][] operator, or a function to get (x, y) tile.
+
+	- seed 
+	- modifications done to certain tiles (so that we don't save the entire map, only the seed and what changed)
+	- size (WIDTH + HEIGHT)
+	
+	
+

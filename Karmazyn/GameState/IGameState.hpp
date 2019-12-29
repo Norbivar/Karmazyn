@@ -1,11 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <SFML/Window/Event.hpp>
-
 namespace Karmazyn
 {
 	class Engine;
+
 	class IGameState
 	{
 	public:
@@ -28,6 +26,8 @@ namespace Karmazyn
 		// Called before we transition from this state to another.
 		// Widely used for hiding/disabling GameState specific GUI elements.
 		virtual void beforeTransitionedOut() {};
+
+		Engine& getEngine() { return theEngine; }
 	protected:
 		Engine& theEngine;
 	};

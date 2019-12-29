@@ -1,9 +1,4 @@
 #pragma once
-#include <atomic>
-#include <thread>
-
-#include <Config.hpp>
-#include <SFML/Graphics.hpp>
 
 namespace Karmazyn
 {
@@ -40,12 +35,13 @@ namespace Karmazyn
 	{	
 	public:
 		RenderWindow();
+		// Returns the wrapped sf::RenderWindow by reference.
 		sf::RenderWindow& unwrap() { return m_RenderWindow; }
 
 		// Creates the sf::RenderWindow with m_ContextSettings and m_WindowStyle parameters and given resolution. 
 		void create(unsigned int width, unsigned int height);
 		// Creates the sf::RenderWindow (by calling create) with config-read resolution.
-		void create_from_config();
+		void createFromConfig();
 		// Creates the m_RenderThread, that will 
 		void createRenderThreadWith(const RenderThreadReferencePasser& passer);
 		void resetRenderThread();
@@ -57,14 +53,14 @@ namespace Karmazyn
 			if (command.newHeight < 600)
 				command.newHeight = 600;
 
-			theConfig->set<int>(Configs::ResolutionX, command.newWidth);
-			theConfig->set<int>(Configs::ResolutionY, command.newHeight);
+			theConfig->set<Configs::ResolutionX>(command.newWidth);
+			theConfig->set<Configs::ResolutionY>(command.newHeight);
 		}
 		template<> void process(RenderWindowCommands::ToggleVSync&& command) {
-			theConfig->set<int>(Configs::VSync, command.newStatus);
+			theConfig->set<Configs::VSync>(command.newStatus);
 		}
 		template<> void process(RenderWindowCommands::ToggleWindowed&& command) {
-			const auto currentConfig = theConfig->get<int>(Configs::RenderWindowStyle); // Style is int-flag 
+			const int currentConfig = theConfig->get<Configs::RenderWindowStyle>(); // Style is int-flag 
 			int configToSet = currentConfig;
 
 			// enable windowed mode
@@ -75,7 +71,7 @@ namespace Karmazyn
 			else
 				configToSet |= sf::Style::Fullscreen;
 
-			theConfig->set<int>(Configs::RenderWindowStyle, configToSet);
+			theConfig->set<Configs::RenderWindowStyle>(configToSet);
 		}
 
 		// Stops the render thread, joins it to current thread and closes the SFML render window.

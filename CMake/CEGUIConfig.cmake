@@ -37,8 +37,16 @@ if (EXISTS "$ENV{CEGUI_ROOT}/lib")
 	file(GLOB CEGUI_ALL_LIBS_RELEASE
 		"${CEGUI_LIBRARIES}/*.lib"
 	)
-	LIST(FILTER CEGUI_ALL_LIBS_DEBUG INCLUDE REGEX ".*_d.lib")
-	LIST(FILTER CEGUI_ALL_LIBS_RELEASE EXCLUDE REGEX ".*_d.lib")
+	if(${CEGUI_STATIC_LIBRARIES})
+		message("Using staticly linked CEGUI.")
+		LIST(FILTER CEGUI_ALL_LIBS_DEBUG INCLUDE REGEX ".*_d.lib") # TODO: make this happen
+		LIST(FILTER CEGUI_ALL_LIBS_RELEASE EXCLUDE REGEX ".*_d.lib")
+	else()
+		message("Using dynamically linked CEGUI.")
+		LIST(FILTER CEGUI_ALL_LIBS_DEBUG INCLUDE REGEX ".*_d.lib")
+		LIST(FILTER CEGUI_ALL_LIBS_RELEASE EXCLUDE REGEX ".*_d.lib")
+	endif()
+
 else()
 	 message(FATAL_ERROR "Could not find CEGUI lib dir!")
 endif()

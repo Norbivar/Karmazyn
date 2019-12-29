@@ -1,6 +1,4 @@
 #include "RenderWindow.hpp"
-#include <Logger.hpp>
-#include <Config.hpp>
 
 #include "../GameStateMachine.hpp"
 #include "../UIManager/UIManager.hpp"
@@ -15,7 +13,7 @@ namespace Karmazyn
 		m_ContextSettings.majorVersion = 3;
 		m_ContextSettings.minorVersion = 2;
 		m_ContextSettings.attributeFlags = sf::ContextSettings::Default;
-		m_WindowStyle = theConfig->get<int>(Configs::RenderWindowStyle, sf::Style::None | sf::Style::Fullscreen);
+		m_WindowStyle = theConfig->get<Configs::RenderWindowStyle>(sf::Style::None | sf::Style::Fullscreen);
 	}
 	void RenderWindow::create(unsigned int width, unsigned int height)
 	{
@@ -26,15 +24,15 @@ namespace Karmazyn
 			m_RenderWindow.getSettings().majorVersion,
 			m_RenderWindow.getSettings().minorVersion
 		);
-		m_RenderWindow.setVerticalSyncEnabled(theConfig->get<bool>(Configs::VSync, true));
+		m_RenderWindow.setVerticalSyncEnabled(theConfig->get<Configs::VSync>(true));
 		m_RenderWindow.setMouseCursorVisible(false);
 		m_RenderWindow.requestFocus();
 	}
-	void RenderWindow::create_from_config()
+	void RenderWindow::createFromConfig()
 	{
 		create(
-			theConfig->get<int>(Configs::ResolutionX, 1024), 
-			theConfig->get<int>(Configs::ResolutionY, 768)
+			theConfig->get<Configs::ResolutionX>(1024),
+			theConfig->get<Configs::ResolutionY>(768)
 		);
 	}
 
@@ -52,6 +50,7 @@ namespace Karmazyn
 				//m_GUI->handleNativeMouseMove(sf::Mouse::getPosition()); // TODO: check whether this is actually better. It feels better a bit, but needs some work around
 				m_RenderWindow.clear(sf::Color::White);
 				passed.GSM.current().render();
+				passed.UI.draw();
 				m_RenderWindow.display();
 			}
 			m_RenderWindow.setActive(false);

@@ -1,11 +1,12 @@
 #pragma once
-#include <CEGUI/CEGUI.h>
 #include "../IGameState.hpp"
 
 namespace Karmazyn
 {
-	class Engine; class UIManager;
-	class GameState_LoadingMenu : public IGameState
+	class UIState_LoadingMenu;
+
+	class GameState_LoadingMenu : 
+		public IGameState
 	{
 	public:
 		GameState_LoadingMenu(Engine& engine);
@@ -19,19 +20,7 @@ namespace Karmazyn
 		void beforeTransitionedOut() override;
 		#pragma endregion
 
-		std::string determineTippText();
-		std::string determineLoadingText();	
 	private:
-		// A shortcut for 'theEngine.getUIManager()'.
-		UIManager& theUI;
-
-		// Root of the loaded Layout (which is a StaticImage -> the background picture)
-		// The tabulation of rows show parent-child relationships
-		CEGUI::Window* m_LoadingGUIRoot;
-			CEGUI::NamedElement*      m_TippLabel;
-			CEGUI::ProgressBar*       m_LoadingProgressbar;
-				CEGUI::NamedElement*      m_LoadingLabel;
-
-		void onLoadingDone(const CEGUI::EventArgs& /*e*/);
+		std::unique_ptr<UIState_LoadingMenu> theUIState;
 	};
 }

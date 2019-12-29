@@ -2,12 +2,13 @@
 #include <array>
 #include <regex>
 
-namespace Karmazyn
+namespace MyPI
 {
 	namespace LoggerSettings
 	{
 		constexpr const char* const cLogFile = "./debug_log.txt";
 	}
+
 	namespace ConfigSettings
 	{
 		// Holds the file names (relative to executable) to open and read settings from.

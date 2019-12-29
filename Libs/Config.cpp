@@ -1,7 +1,7 @@
 #include <fstream>
 #include "Config.hpp"
 
-namespace Karmazyn
+namespace MyPI
 {
 	Config* Config::GetConfig()
 	{
@@ -50,15 +50,10 @@ namespace Karmazyn
 
 					if (m_SettingsRootMap.find(key) != m_SettingsRootMap.end())
 					{
-						theLog->warn("Config: Duplicate key in config ({}), skipping!", key.c_str());
 						continue;
 					}
 
 					m_SettingsRootMap.emplace(key, valueText);
-				}
-				else
-				{
-					theLog->warn("Config: invalid line detected, skipping!");
 				}
 			}
 			return true;

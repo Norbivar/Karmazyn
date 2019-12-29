@@ -44,7 +44,7 @@ namespace Karmazyn
 		template<typename T>
 		std::shared_ptr<T> acquire(const std::string& asset_file_name)
 		{
-			static_assert(false, "AssetManager::acquire instantiated with wrong type!");
+			static_assert(false, "AssetManager::acquire instantiated with NOT SUPPORTED type!");
 		}
 
 		template<>

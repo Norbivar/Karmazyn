@@ -19,27 +19,27 @@ namespace Karmazyn
 
 				const auto size = std::distance(begin, end);
 
-				boost::random::uniform_int_distribution<> randomStep(0, size);
+				boost::random::uniform_int_distribution<> randomStep(0, static_cast<int>(size));
 				boost::random::mt19937 rng;
-				rng.seed(std::time(0));
+				rng.seed(static_cast<uint32_t>(std::time(0)));
 
 				std::advance(begin, randomStep(rng));
 				return begin;
 			}
 			template< typename Container, typename Iterator = Container::const_iterator>
-			Iterator getRandomElement(const Container & container)
+			Iterator getRandomElement(const Container& container)
 			{
 				const auto size = container.size();
 				if (size == 0)
 					return container.end();
 
-				boost::random::uniform_int_distribution<> randomStep(0, size - 1);
-
-				Iterator it = container.begin();
+				boost::random::uniform_int_distribution<> randomStep(0, static_cast<int>(size - 1));
 
 				boost::random::mt19937 rng;
-				rng.seed(std::time(0));
+				rng.seed(static_cast<uint32_t>(std::time(0)));
 				const auto randNumber = randomStep(rng);
+
+				Iterator it = container.begin();
 				std::advance(it, randNumber);
 				return it;
 			}

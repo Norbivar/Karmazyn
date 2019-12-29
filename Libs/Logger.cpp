@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "Logger.hpp"
-namespace Karmazyn
+namespace MyPI
 {
 	Logger* Logger::GetLogger()
 	{

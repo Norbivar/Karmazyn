@@ -1,11 +1,5 @@
 #pragma once
 #include <RenderWindow/RenderWindow.hpp>
-#include <Logger.hpp>
-#include <Config.hpp>
-
-#include <atomic>
-#include <memory>
-#include <thread>
 
 namespace Karmazyn
 {

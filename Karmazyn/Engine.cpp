@@ -1,5 +1,4 @@
 #include "Engine.hpp"
-#include <ConfigList.hpp>
 
 #include "GameState/LoadingMenu/GameState_LoadingMenu.hpp"
 #include "AssetManager/AssetManager.hpp"
@@ -16,7 +15,7 @@ namespace Karmazyn
 
 		m_CoreLoopRunning { false }
 	{
-		m_RenderWindow.create_from_config();
+		m_RenderWindow.createFromConfig();
 		m_UI = std::make_unique<UIManager>(*this); // needs to be initialized after RenderWindow setup
 
 		m_GameStateMachine->transition<GameState_LoadingMenu>();
@@ -26,6 +25,7 @@ namespace Karmazyn
 
 	}
 	int Engine::Run()
+
 	{		
 		theLog->info("GameEngine starting!");
 		sf::Clock clock;
@@ -35,7 +35,7 @@ namespace Karmazyn
 		bool propagnateEvent = false;
 		sf::Event polledEvent;
 
-		const float SEC_BETWEEN_TICKS = 1.0f / theConfig->get<float>(Configs::FrameRateCap, 60);
+		const float SEC_BETWEEN_TICKS = 1.0f / theConfig->get<Configs::FrameRateCap>(60);
 		float diff = 0.0f;
 
 		m_CoreLoopRunning.store(true, std::memory_order::memory_order_relaxed);
@@ -56,10 +56,13 @@ namespace Karmazyn
 			if (propagnateEvent)
 			{
 				if (polledEvent.type == polledEvent.Closed)
-				{
 					Stop();
+				
+				else
+				{
+					if(!m_UI->handleEvent(polledEvent))
+						currentGameState.handleEvent(polledEvent);
 				}
-				else currentGameState.handleEvent(polledEvent);
 			}
 
 			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
@@ -75,7 +78,7 @@ namespace Karmazyn
 	}
 	void Engine::Stop()
 	{
-		m_RenderWindow.close(); // this will close the render window, which will in turn end the main loop and thus the program
+		//m_RenderWindow.close(); // this will close the render window, which will in turn end the main loop and thus the program
 		m_CoreLoopRunning.store(false, std::memory_order::memory_order_relaxed);
 	}
 	void Engine::changeScreenSize(const unsigned int newWidth, const unsigned int newHeight)

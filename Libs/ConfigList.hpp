@@ -1,15 +1,29 @@
 #pragma once
-// Please, only use Config lookups with these. TODO: find something that is strongly-typed and constexpr, to enforce it
-// Or static analyzers/grep could find it easily, so I will not bother bloating the code with structs and such.
+
 namespace Configs
 {
-	constexpr const char* const ResolutionX         = "render_x";
-	constexpr const char* const ResolutionY         = "render_y";
-	constexpr const char* const FrameRateCap        = "maxfps";
-	constexpr const char* const RenderWindowStyle   = "renderwindowstyle";
-	constexpr const char* const VSync               = "vsync";
+	#define CREATE_CONFIG(name, temp, cstr) struct name : public Config { constexpr static const char* getValue() { return cstr; }  typedef temp type;   }
 		
 
+	class Config
+	{
+		Config() = default;
+		constexpr static const char* getValue()
+		{
+			return "UNKOWN";
+		}
+	};
+
+	CREATE_CONFIG(FileLoggingEnabled, bool,  "log_to_file");
+	CREATE_CONFIG(LogLevel,           int,   "log_level");
+
+	CREATE_CONFIG(ResolutionX,        int,   "render_x");
+	CREATE_CONFIG(ResolutionY,        int,   "render_y");
+	CREATE_CONFIG(VSync,              bool,  "debug1");
+	CREATE_CONFIG(FrameRateCap,       int,   "maxfps");
+	CREATE_CONFIG(RenderWindowStyle,  int,   "renderwindowstyle");
+
 	//DEBUG configs:
-	constexpr const char* const PlusTickCount = "debug1";
+	CREATE_CONFIG(PlusTickCount, int, "debug1");
+	#undef CREATE_CONFIG
 }
