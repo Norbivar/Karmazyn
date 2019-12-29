@@ -4,10 +4,6 @@
 #include "../../GameState/LoadingMenu/GameState_LoadingMenu.hpp"
 #include "../../GameState/MainMenu/GameState_MainMenu.hpp"
 
-#include <Engine.hpp> // TODO: remove these two
-#include <GameStateMachine.hpp>
-
-
 namespace Karmazyn
 {
 	UIState_LoadingMenu::UIState_LoadingMenu(UIManager& uimanager, GameState_LoadingMenu& gamestate) :
@@ -41,7 +37,7 @@ namespace Karmazyn
 	void UIState_LoadingMenu::onLoadingDone(const CEGUI::EventArgs& /*e*/)
 	{
 		m_LoadingLabel->setProperty("Text", "DONE!");
-		theGameState.getEngine().getGameStateMachine().transition<GameState_MainMenu>();
+		theGameState.onLoadingDone();
 	}
 
 

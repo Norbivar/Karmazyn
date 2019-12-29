@@ -20,6 +20,7 @@ namespace Karmazyn
 		void beforeTransitionedOut() override;
 		#pragma endregion
 
+		void onLoadingDone();
 	private:
 		std::unique_ptr<UIState_LoadingMenu> theUIState;
 	};

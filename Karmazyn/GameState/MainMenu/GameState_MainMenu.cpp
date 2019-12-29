@@ -24,12 +24,10 @@ namespace Karmazyn
 	{
 
 	}
-
 	void GameState_MainMenu::render() const
 	{
 
 	}
-
 	void GameState_MainMenu::handleEvent(const sf::Event& event)
 	{
 
@@ -43,4 +41,22 @@ namespace Karmazyn
 		theUIState->hide();
 	}
 #pragma endregion
+
+	void GameState_MainMenu::onChangeScreenSize(unsigned int width, unsigned int height) 
+	{
+		theEngine.changeScreenSize(width, height); 
+	}
+	void GameState_MainMenu::onVerticalSyncChanged(bool newValue) 
+	{ 
+		theEngine.changeVerticalSynced(newValue); 
+	}
+	void GameState_MainMenu::onWindowedModeChanged(bool newValue) 
+	{ 
+		theEngine.changeWindowedMode(newValue);
+	}
+
+	void GameState_MainMenu::onQuitGameClicked()
+	{
+		theEngine.Stop();
+	}
 }

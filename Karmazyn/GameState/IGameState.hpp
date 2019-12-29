@@ -27,7 +27,6 @@ namespace Karmazyn
 		// Widely used for hiding/disabling GameState specific GUI elements.
 		virtual void beforeTransitionedOut() {};
 
-		Engine& getEngine() { return theEngine; }
 	protected:
 		Engine& theEngine;
 	};

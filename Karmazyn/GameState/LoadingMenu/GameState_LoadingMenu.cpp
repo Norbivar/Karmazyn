@@ -1,4 +1,5 @@
 #include "GameState_LoadingMenu.hpp"
+#include "../MainMenu/GameState_MainMenu.hpp"
 #include "../../Engine.hpp"
 #include "../../GameStateMachine.hpp"
 
@@ -39,4 +40,9 @@ namespace Karmazyn
 		theUIState->update(diff);
 	}
 #pragma endregion
+	
+	void GameState_LoadingMenu::onLoadingDone()
+	{
+		theEngine.getGameStateMachine().transition<GameState_MainMenu>();
+	}
 }

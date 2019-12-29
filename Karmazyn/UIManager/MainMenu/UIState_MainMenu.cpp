@@ -3,8 +3,6 @@
 #include "../../GameState/MainMenu/GameState_MainMenu.hpp"
 
 #include "../../GameState/Game/GameState_Game.hpp"
-#include <Engine.hpp> // TODO: remove these two
-#include <GameStateMachine.hpp>
 
 namespace Karmazyn
 {
@@ -64,7 +62,7 @@ namespace Karmazyn
 		{
 			auto width = boost::lexical_cast<unsigned int>(m_OptionResolutionWidth->getText().c_str());
 			auto height = boost::lexical_cast<unsigned int>(m_OptionResolutionHeight->getText().c_str());
-			theGameState.getEngine().changeScreenSize(width, height);
+			theGameState.onChangeScreenSize(width, height);
 			m_RestartNotificationLabel->show();
 		});
 		m_OptionResolutionWidth->subscribeEvent(CEGUI::Editbox::EventTextChanged,  resolutionChanged);
@@ -74,14 +72,14 @@ namespace Karmazyn
 		m_OptionVSyncCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
 		{
 			const auto newValue = m_OptionVSyncCheckbox->isSelected();
-			theGameState.getEngine().changeVerticalSynced(newValue);
+			theGameState.onVerticalSyncChanged(newValue);
 			m_RestartNotificationLabel->show();
 		}));
 		// Handle WINDOWEDMODE checking
 		m_OptionWindowedModeCheckbox->subscribeEvent(CEGUI::ToggleButton::EventSelectStateChanged, CEGUI::Event::Subscriber([&]()
 		{
 			const auto newValue = m_OptionWindowedModeCheckbox->isSelected();
-			theGameState.getEngine().changeWindowedMode(newValue);
+			theGameState.onWindowedModeChanged(newValue);
 			m_RestartNotificationLabel->show();
 		}));
 		//Handle close window button on Options Window
@@ -100,7 +98,7 @@ namespace Karmazyn
 	void UIState_MainMenu::onNewGameClicked(const CEGUI::EventArgs&)
 	{
 		theLog->info("NEW GAME CLICKED");
-		theGameState.getEngine().getGameStateMachine().transition<GameState_Game>(6);
+		//theGameState.getEngine().getGameStateMachine().transition<GameState_Game>(6);
 		// TODO: make these logic calls in the Gamestate?
 	}
 
@@ -119,7 +117,7 @@ namespace Karmazyn
 
 	void UIState_MainMenu::onQuitGameClicked(const CEGUI::EventArgs&)
 	{
-		theGameState.getEngine().Stop();
+		theGameState.onQuitGameClicked();
 	}
 
 
