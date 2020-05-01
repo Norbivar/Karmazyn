@@ -5,10 +5,9 @@
 namespace Karmazyn
 {
 	GameState_Game::GameState_Game(Engine& engine, const GameInitParams& params) :
-		IGameState(engine),
-		theUI(engine.getUIManager())
+		IGameState(engine)
 	{
-		CEGUI::Window* root = theUI.getSystem().getDefaultGUIContext().getRootWindow();
+
 	}
 
 	GameState_Game::~GameState_Game()
@@ -20,13 +19,10 @@ namespace Karmazyn
 
 	void GameState_Game::handleEvent(const sf::Event& event)
 	{
-		if (theUI.handleEvent(event))
-			return;
 	}
 	void GameState_Game::render() const
 	{
 
-		theUI.draw();
 	}
 	void GameState_Game::update(float diff)
 	{

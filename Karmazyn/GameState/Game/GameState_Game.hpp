@@ -1,9 +1,5 @@
 #pragma once
 #include "../IGameState.hpp"
-#include <vector>
-#include <memory>
-#include <CEGUI/CEGUI.h>
-#include <SFML/Graphics/Drawable.hpp>
 
 namespace Karmazyn
 {
@@ -31,8 +27,6 @@ namespace Karmazyn
 #pragma endregion
 
 	private:
-		// A shortcut for 'theEngine.getUIManager()'.
-		UIManager& theUI;
-
+		
 	};
 }

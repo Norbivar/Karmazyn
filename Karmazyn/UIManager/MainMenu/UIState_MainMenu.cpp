@@ -1,8 +1,9 @@
 #include "UIState_MainMenu.hpp"
 
 #include "../../GameState/MainMenu/GameState_MainMenu.hpp"
-
 #include "../../GameState/Game/GameState_Game.hpp"
+
+#include <Map/Map.hpp>
 
 namespace Karmazyn
 {
@@ -37,8 +38,8 @@ namespace Karmazyn
 		}
 		m_OptionWindowedModeCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("WindowedModeCheckbox"));
 		{
-			const auto toggled = theConfig->get<Configs::RenderWindowStyle>();
-			m_OptionWindowedModeCheckbox->setSelected(!(toggled & sf::Style::Fullscreen));
+			const auto toggled = theConfig->get<Configs::RenderWindowStyle>() & sf::Style::Fullscreen;
+			m_OptionWindowedModeCheckbox->setSelected(!toggled);
 		}
 
 		m_OptionVSyncCheckbox = static_cast<CEGUI::ToggleButton*>(m_MainMenuRoot->getChildElementRecursive("VSyncCheckbox"));
@@ -98,8 +99,9 @@ namespace Karmazyn
 	void UIState_MainMenu::onNewGameClicked(const CEGUI::EventArgs&)
 	{
 		theLog->info("NEW GAME CLICKED");
-		//theGameState.getEngine().getGameStateMachine().transition<GameState_Game>(6);
-		// TODO: make these logic calls in the Gamestate?
+		Map testmap = Map::create<TestRandomGenerator>(150, 150, 1);
+		testmap.print();
+
 	}
 
 	void UIState_MainMenu::onLoadGameClicked(const CEGUI::EventArgs&)
@@ -127,6 +129,8 @@ namespace Karmazyn
 		m_OptionsWindow->hide();
 
 		m_MainMenuRoot->activate();
+		
+		theLog->info("Main Menu shown!");
 	}
 
 	void UIState_MainMenu::hide()

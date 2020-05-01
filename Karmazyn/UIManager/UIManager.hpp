@@ -163,6 +163,9 @@ namespace Karmazyn
 
 		// Renders all active Windows.
 		void draw() const { m_System.renderAllGUIContexts(); }
+		// Injects time pulse for CEGUI animations.
+		void injectTimePulse(float timeElapsed) { m_System.injectTimePulse(timeElapsed); }
+
 
 		void destroyWindow(CEGUI::Window* win) { m_WindowManager.destroyWindow(win); }
 

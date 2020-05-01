@@ -1,8 +1,4 @@
 #pragma once
-#include <stack>
-#include <memory>
-#include <exception>
-#include <string>
 
 namespace Karmazyn
 {

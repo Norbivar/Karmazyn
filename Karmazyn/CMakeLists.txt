@@ -26,6 +26,7 @@ ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 ##############################################################################################################################################################
 
 SET(DEBUG_INFO true)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(Project_BUILD_DEBUG true)
@@ -84,7 +85,7 @@ endif()
 #	optimized ${SFML_ALL_LIBS_RELEASE} 
 #	debug ${SFML_ALL_LIBS_DEBUG}
 #)
-if(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # TODO: create the equivalent for other compilers?
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FULL /OPT:REF /OPT:ICF")
 		message("ADDING DEBUG INFORMATION: ${CMAKE_EXE_LINKER_FLAGS}")

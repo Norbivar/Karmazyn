@@ -26,17 +26,21 @@ namespace MyPI
 // 				info = 2,
 // 				warn = 3,
 // 				err = 4,
-// 				critical = 5,
+// 				critical = 5,	
 
-			#ifndef NDEBUG
-				spdlog::set_pattern("[%H:%M:%S] %l : %v");
-			#else
-				spdlog::set_pattern("[%H:%M:%S] %v");
-			#endif
+			toggleLogOnlyText(false);
 			spdlog::drop_all();
 			trace("Log started.");
 		}
 		~Logger() { }
+
+		inline void toggleLogOnlyText(bool setTo)
+		{
+			if(!setTo)
+				spdlog::set_pattern("[%H:%M:%S] %l : %v");
+			else
+				spdlog::set_pattern("%v");
+		}
 
 		template<typename Arg1, typename... Args>
 		inline void trace(const char* fmt, const Arg1& arg1, const Args& ... args)

@@ -1,3 +1,7 @@
+CMakeFiles/
+CMakeCache.txt
+Karmazyn/Map/
+
 # Output dirs
 out/
 .vs/

@@ -1,9 +1,4 @@
 #pragma once
-#include <memory>
-#include <map>
-#include <string>
-
-#include <SFML/Graphics.hpp>
 
 namespace Karmazyn
 {

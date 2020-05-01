@@ -1,8 +1,4 @@
 #pragma once
-#include <string>
-#include <array>
-#include <utility>
-#include <boost/random.hpp>
 
 namespace Karmazyn
 {
@@ -58,6 +54,18 @@ namespace Karmazyn
 				);
 				return isometricCoords;
 			}
+
+			// Cartesian coordinate.
+			class Coordinate2D
+			{
+			public:
+				Coordinate2D(uint64_t x, uint64_t y) : coords{ x, y } { }
+				auto getAsIsometric() { return cartesianToIsometric(coords); }
+				auto getAsCartesian() { return coords; }
+
+			private:
+				std::pair<uint64_t, uint64_t> coords;
+			};
 		}
 	}
 	namespace Constants

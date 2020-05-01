@@ -65,9 +65,11 @@ namespace Karmazyn
 				}
 			}
 
-			while (diff >= SEC_BETWEEN_TICKS) // if we got a, say: 2 sec freeze, this will make sure we process the skipped ticks
+			// This will process skipped (frozen/alt-tabbed, etc.) ticks, but feels somewhat clunky
+			// TODO: validate this
+			while (diff >= SEC_BETWEEN_TICKS)
 			{
-				m_UI->getSystem().injectTimePulse(SEC_BETWEEN_TICKS);
+				m_UI->injectTimePulse(SEC_BETWEEN_TICKS);
 				currentGameState.update(SEC_BETWEEN_TICKS);
 				diff -= SEC_BETWEEN_TICKS;
 			}
