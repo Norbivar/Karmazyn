@@ -31,20 +31,23 @@ if (EXISTS "$ENV{CEGUI_ROOT}/lib")
 		message(FATAL_ERROR "Could not find CEGUI_ROOT/dependencies dir!")
 	endif()
 
-	file(GLOB CEGUI_ALL_LIBS_DEBUG
-		"${CEGUI_LIBRARIES}/*.lib"
-	)
-	file(GLOB CEGUI_ALL_LIBS_RELEASE
+	file(GLOB CEGUI_ALL_LIBS
 		"${CEGUI_LIBRARIES}/*.lib"
 	)
 	if(${CEGUI_STATIC_LIBRARIES})
-		message("Using staticly linked CEGUI.")
-		LIST(FILTER CEGUI_ALL_LIBS_DEBUG INCLUDE REGEX ".*_d.lib") # TODO: make this happen
-		LIST(FILTER CEGUI_ALL_LIBS_RELEASE EXCLUDE REGEX ".*_d.lib")
+		message("Using staticly linked CEGUI.") # TODO: make this happen
+		if(${CEGUI_DEBUG})
+			LIST(FILTER CEGUI_ALL_LIBS INCLUDE REGEX ".*_d.lib")
+		elseif()
+			LIST(FILTER CEGUI_ALL_LIBS EXCLUDE REGEX ".*_d.lib")
+		endif()
 	else()
 		message("Using dynamically linked CEGUI.")
-		LIST(FILTER CEGUI_ALL_LIBS_DEBUG INCLUDE REGEX ".*_d.lib")
-		LIST(FILTER CEGUI_ALL_LIBS_RELEASE EXCLUDE REGEX ".*_d.lib")
+		if(${CEGUI_DEBUG})
+			LIST(FILTER CEGUI_ALL_LIBS INCLUDE REGEX ".*_d.lib")
+		elseif()
+			LIST(FILTER CEGUI_ALL_LIBS EXCLUDE REGEX ".*_d.lib")
+		endif()
 	endif()
 
 else()
